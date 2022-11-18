@@ -203,6 +203,7 @@ export default {
 }
 .detail_head_pay{
   display: flex;
+  align-items: center;
 }
 .detail_head_genre{
   display: flex;
