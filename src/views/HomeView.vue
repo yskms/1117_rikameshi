@@ -1,6 +1,7 @@
 <script>
 // @ is an alias to /src
-import DetailComp from '@/components/DetailComp.vue'
+  import DetailComp from '@/components/DetailComp.vue'
+  import EditComp from '@/components/EditComp.vue'
 
   import firebaseApp from "../plugins/firebaseConfig"
   import { getFirestore, getDocs, collection } from "firebase/firestore"
@@ -14,16 +15,16 @@ import DetailComp from '@/components/DetailComp.vue'
 
 export default {
   name: 'HomeView',
-  components: {
-    DetailComp
-  },
+  components: {DetailComp, EditComp,},
   data(){
     return{
       datasArr:[],
       datasArrJson:[],
       isDetail:false,
+      isEdit:false,
       payMethods:['現金','Paypay','d払い','クレカ',],
       genreArr:['ラーメン','肉','定食系','カレー','その他',],
+      detailObj:{},
     }
   },
   mounted(){
@@ -32,21 +33,37 @@ export default {
   methods:{
     async fetchUsersAll(){  //全てのdatasデータ取得
         const querySnapshot = await getDocs(collection(db, "datas"));
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach((docu) => {
           // doc.data() is never undefined for query doc snapshots
-          console.log(doc.id, " => ", doc.data());
-          this.datasArr.push(doc.data())
+          console.log(docu.id, " => ", docu.data());
+          const dataObj = Object.assign(docu.data(),{id:docu.id})
+          console.log(dataObj)
+          this.datasArr.push(dataObj)
+          // this.datasArr.push(docu.data())
           console.log(this.datasArr)
-          console.log(this.datasArr[0])
-          console.log(this.datasArr[0].name)
+          // console.log(this.datasArr[0])
+          // console.log(this.datasArr[0].name)
         });
           this.datasArrJson =  JSON.parse(JSON.stringify(this.datasArr)).concat()
           console.log(firestorage)
 
     },
-    closeDetail(){
+    closeComp(){
       this.isDetail = false
-    }
+      this.isEdit = false
+    },
+    openDetail(id){
+      this.searchDetailObj(id)
+      console.log(this.detailObj)
+      this.isDetail = true
+    },
+    searchDetailObj(id){
+      this.datasArrJson.forEach(e=>{
+        if(e.id==id){
+          Object.assign(this.detailObj, e)
+        }
+      })
+    },
   }
 }
 </script>
@@ -60,8 +77,12 @@ export default {
       </div>
     </div> -->
     <!-- ------------------------>
-    <div class="detail_comp" v-show="isDetail">
-      <DetailComp :datasArr="datasArr" :datasArrJson="datasArrJson" @close="closeDetail()"/>
+    <div class="edit_comp" v-if="isEdit">
+      <EditComp  @close="closeComp()"/>
+    </div>
+    <!-- ------------------------>
+    <div class="detail_comp" v-if="isDetail">
+      <DetailComp :datasArrJson="datasArrJson" :detailObj="detailObj" @close="closeComp()"/>
     </div>
     <!-- ------------------------>
     
@@ -69,7 +90,7 @@ export default {
     <div class="home_main">
       <div class="home_head">
         <span>リカレ</span>
-        <div>+++</div>
+        <div @click="isEdit=!isEdit">+++</div>
       </div>
       <div class="home_tag">
         <div class="home_tag_theme">
@@ -82,7 +103,8 @@ export default {
       </div>
 
       <div class="home_list_main">
-        <div class="home_list_wrap" @click="isDetail=!isDetail">
+        <div v-for="(data,index) in datasArrJson" :key="index"
+        class="home_list_wrap" @click="openDetail(data.id)">
           <div class="home_list_img_wrap">
             <img src="@/assets/ramen.jpeg" alt="">
             <img src="@/assets/ramen.jpeg" alt="">
@@ -90,48 +112,20 @@ export default {
           </div>
           <div class="home_list_ttl_wrap">
             <div class="home_list_ttl">
-              {{datasArrJson[0].name}}
+              {{data.name}}
             </div>
             <div class="home_list_pay_wrap">
-              <div class="home_list_pay" v-for="d in datasArrJson[0].pay" :key="d">
+              <div class="home_list_pay" v-for="d in data.pay" :key="d">
                 {{payMethods[d]}}
               </div>
             </div>
             <div class="home_list_genre_wrap">
-              <div class="home_list_genre" v-for="d in datasArrJson[0].genre" :key="d">
+              <div class="home_list_genre" v-for="d in data.genre" :key="d">
                 {{genreArr[d]}},
               </div>
             </div>
           </div>
         </div>
-
-
-        <div class="home_list_wrap">
-          <div class="home_list_img_wrap">
-            <img src="@/assets/ramen.jpeg" alt="">
-            <img src="@/assets/ramen.jpeg" alt="">
-            <img src="@/assets/ramen.jpeg" alt="">
-          </div>
-          <div class="home_list_ttl_wrap">
-            <div class="home_list_ttl">
-              抱きしめたい
-            </div>
-            <div class="home_list_pay_wrap">
-              <div class="home_list_pay">
-                現金
-              </div>
-              <div class="home_list_pay">
-                paypay
-              </div>
-            </div>
-            <div class="home_list_genre">
-                ラーメン
-            </div>
-          </div>
-        </div>
-
-
-
 
       </div>
     </div>
