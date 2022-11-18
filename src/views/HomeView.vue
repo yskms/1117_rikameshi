@@ -167,6 +167,11 @@ export default {
   text-align: left;
   background-color: yellow;
 }
+.home_tag button{
+  border: 1px solid grey;
+  border-radius: 5px;
+  margin-top: 5px;
+}
 /* ----------------------------------- */
 .home_list_wrap{
   display: flex;

@@ -92,14 +92,14 @@ export default {
 
         <div class="detail_head">
           <div class="batsu" @click="closeWindow()">X</div>
-          <h3><input v-model="this.name" placeholder="店名"></h3>
+          <h3><input v-model="name" placeholder=" 店名"></h3>
           <div class="detail_head_pay">
-              <div v-for="(p,index) in this.pay" :key="index">
+              <div v-for="(p,index) in pay" :key="index">
                 <input type="checkbox" :id="p" v-model="payNow" :value="p">{{payMethods[p]}}
               </div>
           </div>
           <div class="detail_head_genre">
-              <div v-for="(p,index) in this.genre" :key="index">
+              <div v-for="(p,index) in genre" :key="index">
                 <input type="checkbox" :id="p" v-model="genreNow" :value="p">{{genreArr[p]}}
               </div>
           </div>
@@ -113,8 +113,8 @@ export default {
             <p>ポイント</p>
           </div>
           <div class="detail_memo_li_wrap">
-            <li class="detail_memo_li" v-for="(r,index) in this.rootMemo" :key="index">
-              <input v-model="r.value" placeholder='"提供が早い"等'>
+            <li class="detail_memo_li" v-for="(r,index) in rootMemo" :key="index">
+              <input v-model="r.value" placeholder=' "提供が早い"等'>
             </li>
           </div>
         </div>
@@ -196,6 +196,11 @@ export default {
   right: 0;
   cursor: pointer;
 }
+.detail_head input{
+  border: 1px solid grey;
+  border-radius: 5px;
+  /* text-align: center; */
+}
 .detail_head_pay{
   display: flex;
 }
@@ -228,6 +233,11 @@ export default {
   width: 70%;
   text-align: left;
 }
+.detail_memo_li input{
+  border: 1px solid grey;
+  border-radius: 5px;
+  margin: 1px;
+}
 /* --------------------------- */
 .detail_menu{
   width: 100%;
@@ -259,16 +269,22 @@ export default {
 }
 .detail_menu_memo div input{
   width: 90%;
+  border: 1px solid grey;
+  border-radius: 5px;
 }
 .detail_menu_memo p input{
   font-size: 0.8em;
   width: 90%;
+  border: 1px solid grey;
+  border-radius: 5px;
 }
 .detail_menu_price{
   width: 20%;
 }
 .detail_menu_price input{
   width: 80%;
+  border: 1px solid grey;
+  border-radius: 5px;
 }
 /* --------------------------- */
 .detail_refresh{
@@ -278,6 +294,8 @@ export default {
 .detail_refresh_btn{
   padding: 1em;
   border-radius: 10px;
+  border: 1px solid grey;
+  border-radius: 5px;
 }
 /* --------------------------- */
 /* .detail_edit{

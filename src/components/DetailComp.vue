@@ -216,6 +216,10 @@ export default {
   display: flex;
   margin: 10px;
 }
+.detail_react button{
+  border: 1px solid grey;
+  border-radius: 5px;
+}
 /* --------------------------- */
 .detail_edit{
   margin: 5px;
