@@ -1,12 +1,103 @@
 <script>
 // @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue'
+  import DetailComp from '@/components/DetailComp.vue'
+  import EditComp from '@/components/EditComp.vue'
+
+  import firebaseApp from "../plugins/firebaseConfig"
+  import { getFirestore, getDocs, collection } from "firebase/firestore"
+  import { getStorage, ref, storage, uploadBytes, uploadBytesResumable, getDownloadURL, } from "firebase/storage"
+
+
+  const db = getFirestore(firebaseApp)
+  const firestorage = getStorage(firebaseApp)
+
+
 
 export default {
   name: 'HomeView',
-  // components: {
-  //   HelloWorld
-  // },
+  components: {DetailComp, EditComp,},
+  data(){
+    return{
+      datasArr:[],
+      datasArrJson:[],
+      isDetail:false,
+      isEdit:false,
+      payMethods:['現金','Paypay','d払い','クレカ',],
+      genreArr:['ラーメン','肉','定食系','カレー','その他',],
+      detailObj:{},
+
+      img_url:'',
+    }
+  },
+  mounted(){
+    this.fetchDatasAll()
+  },
+  methods:{
+    async fetchDatasAll(){  //全てのdatasデータ取得
+        const querySnapshot = await getDocs(collection(db, "datas"));
+        querySnapshot.forEach((docu) => {
+          // doc.data() is never undefined for query doc snapshots
+          console.log(docu.id, " => ", docu.data());
+          const dataObj = Object.assign(docu.data(),{id:docu.id})
+          console.log(dataObj)
+          this.datasArr.push(dataObj)
+          // this.datasArr.push(docu.data())
+          console.log(this.datasArr)
+          // console.log(this.datasArr[0])
+          // console.log(this.datasArr[0].name)
+        });
+          this.datasArrJson =  JSON.parse(JSON.stringify(this.datasArr)).concat()
+          console.log(firestorage)
+
+    },
+    closeComp(){
+      this.isDetail = false
+      this.isEdit = false
+    },
+    openDetail(id){
+      this.searchDetailObj(id)
+      console.log(this.detailObj)
+      this.isDetail = true
+    },
+    searchDetailObj(id){
+      this.datasArrJson.forEach(e=>{
+        if(e.id==id){
+          Object.assign(this.detailObj, e)
+        }
+      })
+    },
+
+    fileUpload(props) {
+    //アップロードしたい画像の情報を取得。
+    const file = props.target.files[0];
+    //画像ファイルのURLを取得。
+    this.img_url = URL.createObjectURL(file);
+    //"files"は③で作成したフォルダ名
+    //Firebase storageに画像ファイルを送信。
+    const storageRef = ref(storage, "files/" + file.name);
+
+    //Firebaseにデータを適切に送るために必要なコード
+    uploadBytes(storageRef, file).then((snapshot) => {
+      console.log("blobかfileをアップロード", snapshot);
+    });
+  },
+
+  changeImg(e) {
+      this.thumbnail = e.target.files[0]
+      console.log(this.thumbnail)
+
+      const storageRef = ref(storage, `images/${this.thumbnail.name}`)
+      uploadBytesResumable(storageRef, this.thumbnail)
+        .then((snapshot) => {
+          getDownloadURL(snapshot.ref)
+            .then((url) => {
+              console.log('Success! : ' + url)
+            })
+        }).catch((error) => {
+          console.error(error)
+        })
+    }
+  }
 }
 </script>
 
@@ -19,63 +110,63 @@ export default {
       </div>
     </div> -->
     <!-- ------------------------>
-    <div class="detail_cont">
-      <div class="detail_main">
+    <div class="edit_comp" v-if="isEdit">
+      <EditComp  @close="closeComp()"/>
+    </div>
+    <!-- ------------------------>
+    <div class="detail_comp" v-if="isDetail">
+      <DetailComp :datasArrJson="datasArrJson" :detailObj="detailObj" @close="closeComp()"/>
+    </div>
+    <!-- ------------------------>
+    
+    <!-- 全画面表示のもの ここまで-------------------------------------------------------->
+    <div class="home_main">
+      <div class="home_head">
+        <span>リカレ</span>
+        <div @click="isEdit=!isEdit">+++</div>
+      </div>
+      <div class="home_tag">
+        <div class="home_tag_theme">
+          <button>ランキング</button>
+          <button>ランダム5</button>
+        </div>
+        <div class="home_tag_genre">
+          <!-- <button>ラーメン</button> -->
+          <!-- <input type="file" name="fa" id="fa"> -->
+<input type="file" @change="fileUpload" />
+<!-- アップロードされた画像が以下に表示される -->
+  <img v-if="img_url" :src="img_url" />
 
-        <div class="detail_head">
-          <div class="batsu">X</div>
-          <h3>抱きしめたい</h3>
-        </div>
-        <div class="detail_map">
-          <img src="#" alt="">
-        </div>
-        <div class="detail_memo">
-          <div class="detail_memo_ttl">ポイント</div>
-          <div class="detail_memo_li_wrap">
-            <li class="detail_memo_li">
-              よく並んでる
-            </li>
-            <li class="detail_memo_li">
-              提供早い
-            </li>
-            <li class="detail_memo_li">
-              塩対応
-            </li>
-          </div>
-        </div>
-        <div class="detail_menu">
-          <div class="detail_menu_li">
-            <div class="detail_menu_img">
-              <img src="@/assets/ramen.jpeg" alt="">
-            </div>
-            <div>ラーメン</div>
-            <div>900円</div>
-          </div>
-          <div class="detail_menu_li">
-            <div class="detail_menu_img">
-              <img src="@/assets/ramen.jpeg" alt="">
-            </div>
-            <div>ラーメン</div>
-            <div>900円</div>
-          </div>
-          <div class="detail_menu_li">
-            <div class="detail_menu_img">
-              <img src="@/assets/ramen.jpeg" alt="">
-            </div>
-            <div>ラーメン</div>
-            <div>900円</div>
-          </div>
-        </div>
-        <div class="detail_react">
-          <div><button>うまい</button></div>
-          <div><button>イマイチ</button></div>
-        </div>
-        <div class="detail_edit">
-          <div>情報修正</div>
         </div>
       </div>
+
+      <div class="home_list_main">
+        <div v-for="(data,index) in datasArrJson" :key="index"
+        class="home_list_wrap" @click="openDetail(data.id)">
+          <div class="home_list_img_wrap">
+            <img src="@/assets/ramen.jpeg" alt="">
+            <img src="@/assets/ramen.jpeg" alt="">
+            <img src="@/assets/ramen.jpeg" alt="">
+          </div>
+          <div class="home_list_ttl_wrap">
+            <div class="home_list_ttl">
+              {{data.name}}
+            </div>
+            <div class="home_list_pay_wrap">
+              <div class="home_list_pay" v-for="d in data.pay" :key="d">
+                {{payMethods[d]}}
+              </div>
+            </div>
+            <div class="home_list_genre_wrap">
+              <div class="home_list_genre" v-for="d in data.genre" :key="d">
+                {{genreArr[d]}},
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
-    <!-- 全画面表示のもの ここまで-------------------------------------------------------->
     <!-- ------------------------>
   </div>
 </template>
@@ -90,86 +181,82 @@ export default {
   align-items: center;
 }
 /* -------------------------------------------- */
-.detail_cont{
-  height: 90%;
+.home_main{
+  height: 95%;
   width: 90%;
-  background-color: white;
-}
-.detail_main{
-  display: flex;
-  flex-direction: column;
-  /* justify-content: center; */
-  align-items: center;
   background-color: whitesmoke;
-  width: 90%;
-  margin: auto;
+  scroll-snap-type: y mandatory;
+  overflow: auto;
 }
-/* -------------------------------------------- */
-.detail_head{
+/* ----------------------------------- */
+.home_head{
+  height: 4%;
+  background-color: yellowgreen;
   position: relative;
-  width: 100%;
-  /* height: 1.5em; */
 }
-.batsu{
+.home_head div{
   position: absolute;
   top: 0;
   right: 0;
-  cursor: pointer;
 }
-/* --------------------------- */
-.detail_map{
-  width: 100%;
-  height: 30vh;
-  background-color: rgb(0, 0, 136);
+/* ----------------------------------- */
+.home_tag{
+  height: 10%;
+  text-align: left;
+  background-color: yellow;
 }
-/* --------------------------- */
-.detail_memo{
-  display: flex;
-  width: 100%;
-  /* padding: 5px; */
-  background-color: gainsboro;
-  border-radius: 10px;
+.home_tag button{
+  border: 1px solid grey;
+  border-radius: 5px;
   margin-top: 5px;
 }
-.detail_memo_ttl{
-  width: 30%;
-  height: 1em;
-  margin: auto;
-}
-.detail_memo_li_wrap{
-  width: 70%;
-  text-align: left;
-}
-/* --------------------------- */
-.detail_menu{
-  width: 100%;
-}
-.detail_menu_li{
+/* ----------------------------------- */
+.home_list_wrap{
   display: flex;
-  justify-content: space-around;
-  width: 100%;
-  /* background-color: aqua; */
-  border: 1px solid grey;
+  padding: 10px;
+  margin-bottom: 5px;
+  /* background-color: bisque; */
+  border: solid 1px gray;
   border-radius: 10px;
-  height: 3.5em;
-  padding: 2px;
-  margin: 5px 0;
+  height: 15vh;
+  width: 100%;
 }
-.detail_menu_img img{
+/* --------------------------- */
+.home_list_img_wrap{
   height: 100%;
-  /* width: 10%; */
-  object-fit: scale-down;
-}
-/* --------------------------- */
-.detail_react{
+  width: 50%;
+  scroll-snap-type: x mandatory;
+  overflow: auto;
   display: flex;
-  margin: 10px;
+  gap: 3px;
+}
+.home_list_img_wrap img{
+  height: 100%;
+  object-fit: scale-down;
+  object-position: center center;
 }
 /* --------------------------- */
-.detail_edit{
-  margin: 5px;
-  background-color: aliceblue;
-  
+.home_list_ttl_wrap{
+  width: 50%;
+  height: 100%;
+}
+.home_list_ttl{
+  height: 40%;
+  font-size: 1.2em;
+}
+.home_list_pay_wrap{
+  height: 30%;
+  display: flex;
+  justify-content: end;
+  gap: 5px;
+  font-size: 0.9em;
+}
+.home_list_genre_wrap{
+  height: 30%;
+  display: flex;
+  justify-content: end;
+  gap: 5px;
+  font-size: 0.9em;
 }
 /* --------------------------- */
 /* --------------------------- */

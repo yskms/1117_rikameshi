@@ -28,10 +28,10 @@ export default {
     }
   },
   mounted(){
-    this.fetchUsersAll()
+    this.fetchDatasAll()
   },
   methods:{
-    async fetchUsersAll(){  //全てのdatasデータ取得
+    async fetchDatasAll(){  //全てのdatasデータ取得
         const querySnapshot = await getDocs(collection(db, "datas"));
         querySnapshot.forEach((docu) => {
           // doc.data() is never undefined for query doc snapshots
