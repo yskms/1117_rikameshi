@@ -1,7 +1,7 @@
 <script>
   import firebaseApp from "../plugins/firebaseConfig"
   import { getFirestore, getDocs, collection } from "firebase/firestore"
-  import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL, } from "firebase/storage"
+  import { getStorage, ref, uploadBytesResumable, getDownloadURL, } from "firebase/storage"
 
   const db = getFirestore(firebaseApp)
   const firestorage = getStorage(firebaseApp)
@@ -27,30 +27,25 @@ export default {
       // fav:0,
       payMethods:['現金','Paypay','d払い','クレカ',],
       genreArr:['ラーメン','肉','定食系','カレー','その他',],
-      isRegist:false,
+      isRegist:false,//編集か新規登録かのフラグ
 
-      img_url:'',
-      thumbnail:'',
+      thumbnail:['','',''],//画像情報たくさんのオブジェクト
+      img_url:['','',''], //画像描画用にローカルのURL or FirestorageのURLを入れる
+      // isImg_url:[false,false,false],
     }
   },
   mounted(){//こいつの実行は親のマウント時だわこれ！
     // this.fetchUsersAll()
         console.log('edit mounted')
-        // console.log(this.detailObj.menu[0].img)
-        // setTimeout(()=>{
-        // this.isShow = true
-        // console.log(this.datasArrJson)
-        // console.log(this.detailObj.menu[0].img)
-        // },1000)
-        if(this.detailObj){
+        if(this.detailObj){ //detailObjを受け取っていれば編集モード
           this.copyData()
         }else{
-          this.isRegist = true
+          this.isRegist = true  //じゃないなら新規作成だよ
           this.formatData()
         }
   },
   methods:{
-    copyData(){
+    copyData(){ //編集モードなので、元のデータを引用します
       this.name = this.detailObj.name
       // this.pay = this.detailObj.pay.concat()
       this.payNow = this.detailObj.pay.concat()
@@ -58,14 +53,18 @@ export default {
       // Object.assign(this.map, this.detailObj.map)
       this.rootMemo = this.detailObj.rootMemo.concat()
       this.menu = this.detailObj.menu.concat()
+      for(let i=0;i<3;i++){
+        this.img_url[i]=this.menu[i].img
+      }
     },
-    formatData(){
+    formatData(){ //新規作成なので、念のためデータをリセットします
       this.name = ""
       this.payNow = []
       this.genreNow = []
       this.rootMemo = [{value:'',score:0},{value:'',score:0},{value:'',score:0},{value:'',score:0},{value:'',score:0}]
       this.menu = [{menuName:'',price:null,memo:'',img:''},{menuName:'',price:null,memo:'',img:''},{menuName:'',price:null,memo:'',img:''}]
     },
+    // ---------これここでは使ってませんね---------------------
     async fetchUsersAll(){  //全てのdatasデータ取得
         const querySnapshot = await getDocs(collection(db, "datas"));
         querySnapshot.forEach((doc) => {
@@ -77,22 +76,27 @@ export default {
           console.log(this.datasArr[0].name)
         });
     },
+    // ---------これここでは使ってませんね---------------------
+
     closeWindow(){
       this.$emit('close')
     },
-    imgUpload(e) {
-      console.log(e)
-      // console.log(index)
-      this.thumbnail = e.target.files[0]
-      console.log(this.thumbnail)
-    this.img_url = URL.createObjectURL(this.thumbnail)
+    
+    imgUpload(event, index) {
+      console.log(event)
+      console.log(index)
+      this.thumbnail[index] = event.target.files[0]
+      console.log(this.thumbnail[index])
+      this.img_url[index] = URL.createObjectURL(this.thumbnail[index])
+      this.img_url.splice()//配列を変更しないけど変更して、Vueに反応させてます
 
-      const storageRef = ref(firestorage, `files/${this.thumbnail.name}`)
-      uploadBytesResumable(storageRef, this.thumbnail)
+      const storageRef = ref(firestorage, `files/${this.thumbnail[index].name}`)
+      uploadBytesResumable(storageRef, this.thumbnail[index])
         .then((snapshot) => {
           getDownloadURL(snapshot.ref)
             .then((url) => {
               console.log('Success! : ' + url)
+              this.img_url[index] = url
             })
         }).catch((error) => {
           console.error(error)
@@ -147,17 +151,17 @@ export default {
           <div class="detail_menu_li" v-for="(m,index) in menu" :key="index">
             <div class="detail_menu_img">
               <!-- ここ追加してる -->
-              <input type="file" :id="'img'+ index" accept="img/*" @change="imgUpload"
+              <input type="file" :id="'img'+ index" accept="img/*" @change="imgUpload($event, index)"
               style="display:none">
               <label :for="'img'+ index">
-                <div  v-if="!img_url" >
+                <div  v-if="!img_url[index]" >
                   <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
                     <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
                     <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54A.505.505 0 0 1 1 12.5v-9a.5.5 0 0 1 .5-.5h13z"/>
                   </svg>
                 </div>
-                <div class="imgfile" v-if="img_url" >
-                    <img :src="img_url" />
+                <div class="imgfile" v-else >
+                    <img :src="img_url[index]" />
                 </div>
               </label>
               <!-- <img :src="this.detailObj.menu[0].img" alt=""> -->
@@ -346,5 +350,8 @@ export default {
   
 } */
 /* --------------------------- */
+.imgView{
+  
+}
 /* --------------------------- */
 </style>
