@@ -1,8 +1,11 @@
 <script>
   import firebaseApp from "../plugins/firebaseConfig"
   import { getFirestore, getDocs, collection } from "firebase/firestore"
+  import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL, } from "firebase/storage"
 
   const db = getFirestore(firebaseApp)
+  const firestorage = getStorage(firebaseApp)
+
 
 export default {
   name: 'EditComp',
@@ -25,6 +28,9 @@ export default {
       payMethods:['現金','Paypay','d払い','クレカ',],
       genreArr:['ラーメン','肉','定食系','カレー','その他',],
       isRegist:false,
+
+      img_url:'',
+      thumbnail:'',
     }
   },
   mounted(){//こいつの実行は親のマウント時だわこれ！
@@ -74,6 +80,24 @@ export default {
     closeWindow(){
       this.$emit('close')
     },
+    imgUpload(e) {
+      console.log(e)
+      // console.log(index)
+      this.thumbnail = e.target.files[0]
+      console.log(this.thumbnail)
+    this.img_url = URL.createObjectURL(this.thumbnail)
+
+      const storageRef = ref(firestorage, `files/${this.thumbnail.name}`)
+      uploadBytesResumable(storageRef, this.thumbnail)
+        .then((snapshot) => {
+          getDownloadURL(snapshot.ref)
+            .then((url) => {
+              console.log('Success! : ' + url)
+            })
+        }).catch((error) => {
+          console.error(error)
+        })
+    },
   }
 }
 </script>
@@ -122,6 +146,20 @@ export default {
 
           <div class="detail_menu_li" v-for="(m,index) in menu" :key="index">
             <div class="detail_menu_img">
+              <!-- ここ追加してる -->
+              <input type="file" :id="'img'+ index" accept="img/*" @change="imgUpload"
+              style="display:none">
+              <label :for="'img'+ index">
+                <div  v-if="!img_url" >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
+                    <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                    <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54A.505.505 0 0 1 1 12.5v-9a.5.5 0 0 1 .5-.5h13z"/>
+                  </svg>
+                </div>
+                <div class="imgfile" v-if="img_url" >
+                    <img :src="img_url" />
+                </div>
+              </label>
               <!-- <img :src="this.detailObj.menu[0].img" alt=""> -->
               <!-- <img :src="gs://rikameshi.appspot.com/andrew-butler-aUu8tZFNgfM-unsplash.jpg" alt=""> -->
             </div>
@@ -258,11 +296,14 @@ export default {
 .detail_menu_img{
   height: 100%;
   width: 20%;
-  background-color: rgb(0, 50, 23);
+  /* background-color: rgb(0, 50, 23); */
 }
-.detail_menu_img img{
+.imgfile{
   height: 100%;
-  /* width: 10%; */
+}
+.imgfile img{
+  height: 100%;
+  width: 100%;
   object-fit: scale-down;
 }
 .detail_menu_memo{

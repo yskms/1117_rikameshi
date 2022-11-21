@@ -5,7 +5,7 @@
 
   import firebaseApp from "../plugins/firebaseConfig"
   import { getFirestore, getDocs, collection } from "firebase/firestore"
-  import { getStorage, ref, storage, uploadBytes, uploadBytesResumable, getDownloadURL, } from "firebase/storage"
+  import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL, } from "firebase/storage"
 
 
   const db = getFirestore(firebaseApp)
@@ -27,6 +27,7 @@ export default {
       detailObj:{},
 
       img_url:'',
+      thumbnail:'',
     }
   },
   mounted(){
@@ -74,7 +75,7 @@ export default {
     this.img_url = URL.createObjectURL(file);
     //"files"は③で作成したフォルダ名
     //Firebase storageに画像ファイルを送信。
-    const storageRef = ref(storage, "files/" + file.name);
+    const storageRef = ref(firestorage, "files/" + file.name);
 
     //Firebaseにデータを適切に送るために必要なコード
     uploadBytes(storageRef, file).then((snapshot) => {
@@ -85,8 +86,9 @@ export default {
   changeImg(e) {
       this.thumbnail = e.target.files[0]
       console.log(this.thumbnail)
+    this.img_url = URL.createObjectURL(this.thumbnail)
 
-      const storageRef = ref(storage, `images/${this.thumbnail.name}`)
+      const storageRef = ref(firestorage, `files/${this.thumbnail.name}`)
       uploadBytesResumable(storageRef, this.thumbnail)
         .then((snapshot) => {
           getDownloadURL(snapshot.ref)
@@ -96,7 +98,7 @@ export default {
         }).catch((error) => {
           console.error(error)
         })
-    }
+    },
   }
 }
 </script>
@@ -127,15 +129,28 @@ export default {
       </div>
       <div class="home_tag">
         <div class="home_tag_theme">
-          <button>ランキング</button>
-          <button>ランダム5</button>
+          <!-- <button>ランキング</button> -->
+          <!-- <button>ランダム5</button> -->
         </div>
         <div class="home_tag_genre">
           <!-- <button>ラーメン</button> -->
           <!-- <input type="file" name="fa" id="fa"> -->
 <input type="file" @change="fileUpload" />
 <!-- アップロードされた画像が以下に表示される -->
-  <img v-if="img_url" :src="img_url" />
+  
+    <input type="file" id="file" accept="img/*" @change="changeImg"
+    style="display:none">
+    <label for="file">
+      <div  v-if="!img_url" >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
+          <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+          <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54A.505.505 0 0 1 1 12.5v-9a.5.5 0 0 1 .5-.5h13z"/>
+        </svg>
+      </div>
+      <div  v-if="img_url" >
+          <img :src="img_url" />
+      </div>
+    </label>
 
         </div>
       </div>
