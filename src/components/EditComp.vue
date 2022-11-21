@@ -1,6 +1,6 @@
 <script>
   import firebaseApp from "../plugins/firebaseConfig"
-  import { getFirestore, getDocs, collection } from "firebase/firestore"
+  import { getFirestore, getDocs, collection, setDoc, doc, } from "firebase/firestore"
   import { getStorage, ref, uploadBytesResumable, getDownloadURL, } from "firebase/storage"
 
   const db = getFirestore(firebaseApp)
@@ -31,12 +31,13 @@ export default {
 
       thumbnail:['','',''],//画像情報たくさんのオブジェクト
       img_url:['','',''], //画像描画用にローカルのURL or FirestorageのURLを入れる
-      // isImg_url:[false,false,false],
     }
   },
   mounted(){//こいつの実行は親のマウント時だわこれ！
     // this.fetchUsersAll()
         console.log('edit mounted')
+        console.log(this.detailObj)
+        console.log(this.detailObj.id)
         if(this.detailObj){ //detailObjを受け取っていれば編集モード
           this.copyData()
         }else{
@@ -81,7 +82,7 @@ export default {
     closeWindow(){
       this.$emit('close')
     },
-    
+
     imgUpload(event, index) {
       console.log(event)
       console.log(index)
@@ -102,6 +103,36 @@ export default {
           console.error(error)
         })
     },
+  
+    run(){
+      console.log(this.name)
+      console.log(this.payNow)
+      console.log(this.genreNow)
+      console.log(this.rootMemo)
+      console.log(this.menu)
+      this.updateFiredatas()},
+    //firestoreをアップデートするメソッド
+    async updateFiredatas(){
+
+      //画像URLをimg_urlで処理していたので、menuに反映させておきます
+      for(let i=0;i<3;i++){
+        this.menu[i].img = this.img_url[i]
+      }
+
+      //datas内の既存のuidに対して、上書き保存します
+      await setDoc(doc(db, "datas", this.detailObj.id), 
+      { name: this.name,
+        pay: this.payNow,
+        genre: this.genreNow,
+        rootMemo: JSON.parse(JSON.stringify(this.rootMemo)),
+        menu: JSON.parse(JSON.stringify(this.menu)),
+        },
+      { merge: true }
+      );
+      console.log('update data!')
+      this.closeWindow()
+    },
+
   }
 }
 </script>
@@ -177,7 +208,7 @@ export default {
         </div>
 
         <div class="detail_refresh" v-show="!isRegist">
-          <div><button class="detail_refresh_btn">更新する</button></div>
+          <div><button class="detail_refresh_btn" @click="run()">更新する</button></div>
         </div>
         <div class="detail_refresh" v-show="isRegist">
           <div><button class="detail_refresh_btn">登録する</button></div>
