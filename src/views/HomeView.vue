@@ -5,11 +5,11 @@
 
   import firebaseApp from "../plugins/firebaseConfig"
   import { getFirestore, getDocs, collection } from "firebase/firestore"
-  import { getStorage, } from "firebase/storage"
+  // import { getStorage, } from "firebase/storage"
 
 
   const db = getFirestore(firebaseApp)
-  const firestorage = getStorage(firebaseApp)
+  // const firestorage = getStorage(firebaseApp)
 
 
 
@@ -45,7 +45,7 @@ export default {
           // console.log(this.datasArr[0].name)
         });
           this.datasArrJson =  JSON.parse(JSON.stringify(this.datasArr)).concat()
-          console.log(firestorage)
+          console.log(this.datasArrJson)
 
     },
     closeComp(){
@@ -105,11 +105,13 @@ export default {
       <div class="home_list_main">
         <div v-for="(data,index) in datasArrJson" :key="index"
         class="home_list_wrap" @click="openDetail(data.id)">
+
           <div class="home_list_img_wrap">
-            <img src="@/assets/ramen.jpeg" alt="">
-            <img src="@/assets/ramen.jpeg" alt="">
-            <img src="@/assets/ramen.jpeg" alt="">
+            <div class="home_list_img" v-for="(d,index) in data.menu" :key="index">
+                <img :src="d.img" alt="">
+            </div>
           </div>
+
           <div class="home_list_ttl_wrap">
             <div class="home_list_ttl">
               {{data.name}}
@@ -187,13 +189,22 @@ export default {
 .home_list_img_wrap{
   height: 100%;
   width: 50%;
+  display: flex;
+  /* gap: 3px; */
   scroll-snap-type: x mandatory;
   overflow: auto;
-  display: flex;
-  gap: 3px;
 }
-.home_list_img_wrap img{
+.home_list_img{
+  height: 90%;
+  width: 100%;
+  /* overflow: hidden; */
+  /* scroll-snap-type: x mandatory; */
+  /* overflow: auto; */
+  /* object-fit: scale-down; */
+}
+.home_list_img img{
   height: 100%;
+  /* width: 100%; */
   object-fit: scale-down;
   object-position: center center;
 }

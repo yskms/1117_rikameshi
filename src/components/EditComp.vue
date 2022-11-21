@@ -37,7 +37,7 @@ export default {
     // this.fetchUsersAll()
         console.log('edit mounted')
         console.log(this.detailObj)
-        console.log(this.detailObj.id)
+        // console.log(this.detailObj.id)
         if(this.detailObj){ //detailObjを受け取っていれば編集モード
           this.copyData()
         }else{
