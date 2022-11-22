@@ -4,7 +4,7 @@
   import { getFirestore, getDocs, collection } from "firebase/firestore"
 
 import 'leaflet/dist/leaflet.css'
-import { LMap, LTileLayer,LMarker } from "vue2-leaflet";
+import L from "leaflet";
 import { Icon } from 'leaflet';
 
 delete Icon.Default.prototype._getIconUrl;
@@ -18,9 +18,10 @@ Icon.Default.mergeOptions({
 
 export default {
   name: 'DetailComp',
-  props: ['detailObj',],
+  props: ['detailObjP',],
   components: {
-    EditComp, LMap, LTileLayer, LMarker,
+    EditComp, 
+    // LMap, LTileLayer, LMarker,
   },
   data(){
     return{
@@ -30,20 +31,76 @@ export default {
       payMethods:['現金','Paypay','d払い','クレカ',],
       genreArr:['ラーメン','肉','定食系','カレー','その他',],
 
-    url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
-    zoom: 8,
-    center: [34, 137],
-    testdata:'',
+      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      // url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
+      attribution:'© <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      zoom: 16,
+      center: [34.6882035,135.492256],
+      markerLatLng: {lat:JSON.parse(JSON.stringify(this.detailObj.map)).latitude,
+                      lng:JSON.parse(JSON.stringify(this.detailObj.map)).longitude},
+      // option1: { name: "1" },//いらんかった
+
+      detailObj:{},
+      name : this.detailObj.name,
+      // this.pay : this.detailObj.pay.concat()
+      payNow : this.detailObj.pay,
+      genreNow : this.detailObj.genre,
+      // Object.assign(this.map, this.detailObj.map)
+      rootMemo : this.detailObj.rootMemo,
+      menu : this.detailObj.menu,
+      img_url:[],
 
     }
+  },
+  computed:{
+    // detailObj(){
+    //   return this.detailObj
+    // }
   },
   mounted(){
     // this.fetchUsersAll()
     console.log('detail mounted')
         // console.log(this.datasArrJson)
         // console.log(this.detailObj.menu[0].img)
+
+      this.dataSet()
+      this.mapSet()
+  
   },
   methods:{
+    dataSet(){
+      this.detailObj = {}
+      Object.assign(this.detailObj,this.detailObjP)
+    },
+    mapSet(){
+      const map = L.map("detail_map", {
+        center: L.latLng(34.6882035,135.492256),
+        // attribution:'© <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+        zoom: 16,
+        // options:"option1"
+      })
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '}).addTo(map)
+      // .addLayer(L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"))
+      let addMarker = L.marker(this.markerLatLng).addTo(map)
+      console.log(addMarker)
+      // map.on("click", p => {
+      //   if(addMarker){map.removeLayer(addMarker)}
+      //   // this.markerLatLng = p.latlng
+      //   // map.addLayer(L.marker(p.latlng))
+      //   this.markerLatLng = p.latlng
+      //   addMarker = L.marker(this.markerLatLng).addTo(map)
+      //   console.log(addMarker)
+      //   console.log(this.markerLatLng)
+      // })
+      // .on("click", this.selectGeo)
+      // .addLayer(L.marker(this.markerLatLng))
+      console.log(map)
+    },
+    selectGeo(p){
+      console.log(p.latlng)
+      this.markerLatLng = p.latlng
+      console.log(this.markerLatLng)
+    },
     async fetchUsersAll(){  //全てのdatasデータ取得
         const querySnapshot = await getDocs(collection(db, "datas"));
         querySnapshot.forEach((doc) => {
@@ -72,7 +129,7 @@ export default {
   <div class="detail_home_cont">
     <!-- 全画面表示のもの -------------------------------------------------------->
     <div class="edit_comp" v-if="isEdit">
-      <EditComp :detailObj="detailObj" @close="closeEdit()"/>
+      <EditComp :detailObj="detailObj" @close="closeEdit()" @reload="$listeners['reload']"/>
     </div>
     <!-- ------------------------>
     <div class="detail_cont">
@@ -85,18 +142,13 @@ export default {
           <div><span v-for="d in detailObj.pay" :key="d">{{ genreArr[d] }},</span></div>
         
         </div>
-        <div class="detail_map">
-
-
-
-          <div>{{ testdata }}</div>
-          <l-map style="height: 250px" :zoom="zoom" :center="center">
+        <div id="detail_map"  v-show="!isEdit"><!-------------------------->
+          <!-- <div>{{ testdata }}</div> -->
+          <!-- <l-map style="height: 100%" :zoom="zoom" :center="center">
             <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
             <l-marker :lat-lng="markerLatLng"></l-marker>
-          </l-map>
-
-
-
+          </l-map> -->
+          <!-- -------------------------------------->
 
         </div>
         <div class="detail_memo">
@@ -189,7 +241,7 @@ export default {
   cursor: pointer;
 }
 /* --------------------------- */
-.detail_map{
+#detail_map{
   width: 100%;
   height: 30vh;
   background-color: rgb(0, 0, 136);

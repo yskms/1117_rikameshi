@@ -3,6 +3,18 @@
   import { getFirestore, getDocs, collection, setDoc, doc, } from "firebase/firestore"
   import { getStorage, ref, uploadBytesResumable, getDownloadURL, } from "firebase/storage"
 
+
+  import 'leaflet/dist/leaflet.css'
+  import L from "leaflet";
+  import { Icon } from 'leaflet';
+
+  delete Icon.Default.prototype._getIconUrl;
+  Icon.Default.mergeOptions({
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+    iconUrl: require('leaflet/dist/images/marker-icon.png'),
+    shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+  });
+
   const db = getFirestore(firebaseApp)
   const firestorage = getStorage(firebaseApp)
 
@@ -31,19 +43,24 @@ export default {
 
       thumbnail:['','',''],//画像情報たくさんのオブジェクト
       img_url:['','',''], //画像描画用にローカルのURL or FirestorageのURLを入れる
+
+      markerLatLng2: {},
+      // option2: { name: "2" },
     }
   },
-  mounted(){//こいつの実行は親のマウント時だわこれ！
-    // this.fetchUsersAll()
+  mounted(){
         console.log('edit mounted')
         console.log(this.detailObj)
         // console.log(this.detailObj.id)
         if(this.detailObj){ //detailObjを受け取っていれば編集モード
           this.copyData()
+          this.mapUpdate()
         }else{
           this.isRegist = true  //じゃないなら新規作成だよ
           this.formatData()
+          this.mapUpdate()
         }
+        
   },
   methods:{
     copyData(){ //編集モードなので、元のデータを引用します
@@ -57,6 +74,11 @@ export default {
       for(let i=0;i<3;i++){
         this.img_url[i]=this.menu[i].img
       }
+      console.log(this.detailObj.map)
+      console.log(JSON.parse(JSON.stringify(this.detailObj.map)))
+      this.markerLatLng2.lat = JSON.parse(JSON.stringify(this.detailObj.map)).latitude
+      this.markerLatLng2.lng = JSON.parse(JSON.stringify(this.detailObj.map)).longitude
+      console.log(this.markerLatLng2)
     },
     formatData(){ //新規作成なので、念のためデータをリセットします
       this.name = ""
@@ -64,6 +86,29 @@ export default {
       this.genreNow = []
       this.rootMemo = [{value:'',score:0},{value:'',score:0},{value:'',score:0},{value:'',score:0},{value:'',score:0}]
       this.menu = [{menuName:'',price:null,memo:'',img:''},{menuName:'',price:null,memo:'',img:''},{menuName:'',price:null,memo:'',img:''}]
+    },
+    mapUpdate(){
+      const map2 = L.map("detail_map2", {
+        center: L.latLng(34.6882035,135.492256),
+        // attribution:'© <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+        zoom: 16,
+        // options:"option2"
+      })
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, '}).addTo(map2)
+      // .addLayer(L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"))
+      let addMarker2 = L.marker(this.markerLatLng2).addTo(map2)
+      map2.on("click", p => {
+        if(addMarker2){map2.removeLayer(addMarker2)}
+        // this.markerLatLng2 = p.latlng
+        // map.addLayer(L.marker(p.latlng))
+        this.markerLatLng2 = p.latlng
+        addMarker2 = L.marker(this.markerLatLng2).addTo(map2)
+        console.log(addMarker2)
+        console.log(JSON.parse(JSON.stringify(this.markerLatLng2)))
+      })
+      // .on("click", this.selectGeo)
+      // .addLayer(L.marker(this.markerLatLng2))
+      console.log(map2)
     },
     // ---------これここでは使ってませんね---------------------
     async fetchUsersAll(){  //全てのdatasデータ取得
@@ -126,10 +171,13 @@ export default {
         genre: this.genreNow,
         rootMemo: JSON.parse(JSON.stringify(this.rootMemo)),
         menu: JSON.parse(JSON.stringify(this.menu)),
+        map: {latitude: this.markerLatLng2.lat, longitude: this.markerLatLng2.lng}
         },
       { merge: true }
       );
       console.log('update data!')
+      this.$emit('reload')
+      console.log('update parent data!')
       this.closeWindow()
     },
 
@@ -164,9 +212,10 @@ export default {
           </div>
 
         </div>
-        <div class="detail_map">
-          <img src="#" alt="">
+        <!-- leaflet ------------------------------------- -->
+        <div id="detail_map2">
         </div>
+        <!-- leaflet ------------------------------------- -->
         <div class="detail_memo">
           <div class="detail_memo_ttl">
             <p>ポイント</p>
@@ -282,7 +331,7 @@ export default {
   display: flex;
 }
 /* --------------------------- */
-.detail_map{
+#detail_map2{
   width: 100%;
   height: 30vh;
   background-color: rgb(0, 0, 136);

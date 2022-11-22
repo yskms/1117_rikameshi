@@ -24,14 +24,17 @@ export default {
       isEdit:false,
       payMethods:['現金','Paypay','d払い','クレカ',],
       genreArr:['ラーメン','肉','定食系','カレー','その他',],
-      detailObj:{},
+      detailObjP:{},
     }
   },
   mounted(){
+    console.log('home mounted')
     this.fetchDatasAll()
   },
   methods:{
     async fetchDatasAll(){  //全てのdatasデータ取得
+        this.datasArr = []
+        this.datasArrJson = []
         const querySnapshot = await getDocs(collection(db, "datas"));
         querySnapshot.forEach((docu) => {
           // doc.data() is never undefined for query doc snapshots
@@ -39,13 +42,10 @@ export default {
           const dataObj = Object.assign(docu.data(),{id:docu.id})
           console.log(dataObj)
           this.datasArr.push(dataObj)
-          // this.datasArr.push(docu.data())
           console.log(this.datasArr)
-          // console.log(this.datasArr[0])
-          // console.log(this.datasArr[0].name)
         });
-          this.datasArrJson =  JSON.parse(JSON.stringify(this.datasArr)).concat()
-          console.log(this.datasArrJson)
+        this.datasArrJson =  JSON.parse(JSON.stringify(this.datasArr)).concat()
+        console.log(this.datasArrJson)
 
     },
     closeComp(){
@@ -54,13 +54,13 @@ export default {
     },
     openDetail(id){
       this.searchDetailObj(id)
-      console.log(this.detailObj)
+      console.log(this.detailObjP)
       this.isDetail = true
     },
     searchDetailObj(id){
       this.datasArrJson.forEach(e=>{
         if(e.id==id){
-          Object.assign(this.detailObj, e)
+          Object.assign(this.detailObjP, e)
         }
       })
     },
@@ -82,7 +82,8 @@ export default {
     </div>
     <!-- ------------------------>
     <div class="detail_comp" v-if="isDetail">
-      <DetailComp :datasArrJson="datasArrJson" :detailObj="detailObj" @close="closeComp()"/>
+      <DetailComp :datasArrJson="datasArrJson" :detailObjP="detailObjP" 
+      @close="closeComp()" @reload="fetchDatasAll()"/>
     </div>
     <!-- ------------------------>
     
