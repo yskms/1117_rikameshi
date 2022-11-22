@@ -1,7 +1,7 @@
 <script>
   import EditComp from '@/components/EditComp.vue'
   import firebaseApp from "../plugins/firebaseConfig"
-  import { getFirestore, getDocs, collection } from "firebase/firestore"
+  import { getFirestore, getDocs, collection, getDoc, doc, } from "firebase/firestore"
 
 import 'leaflet/dist/leaflet.css'
 import L from "leaflet";
@@ -36,19 +36,21 @@ export default {
       attribution:'© <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       zoom: 16,
       center: [34.6882035,135.492256],
-      markerLatLng: {lat:JSON.parse(JSON.stringify(this.detailObj.map)).latitude,
-                      lng:JSON.parse(JSON.stringify(this.detailObj.map)).longitude},
+      markerLatLng: {lat:JSON.parse(JSON.stringify(this.detailObjP.map)).latitude,
+                      lng:JSON.parse(JSON.stringify(this.detailObjP.map)).longitude},
       // option1: { name: "1" },//いらんかった
 
       detailObj:{},
-      name : this.detailObj.name,
-      // this.pay : this.detailObj.pay.concat()
-      payNow : this.detailObj.pay,
-      genreNow : this.detailObj.genre,
+      name : this.detailObjP.name,
+      pay : this.detailObjP.pay,
+      // payNow : this.detailObjP.pay,
+      genre : this.detailObjP.genre,
       // Object.assign(this.map, this.detailObj.map)
-      rootMemo : this.detailObj.rootMemo,
-      menu : this.detailObj.menu,
+      rootMemo : this.detailObjP.rootMemo,
+      menu : this.detailObjP.menu,
       img_url:[],
+
+      isMapDel:false,
 
     }
   },
@@ -60,6 +62,7 @@ export default {
   mounted(){
     // this.fetchUsersAll()
     console.log('detail mounted')
+    console.log(this.detailObjP)
         // console.log(this.datasArrJson)
         // console.log(this.detailObj.menu[0].img)
 
@@ -83,7 +86,11 @@ export default {
       // .addLayer(L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"))
       let addMarker = L.marker(this.markerLatLng).addTo(map)
       console.log(addMarker)
-      // map.on("click", p => {
+      if(this.isMapDel){
+        this.isMapDel = false
+        map.remove()
+      }
+      // map.on("viewreset", p => {
       //   if(addMarker){map.removeLayer(addMarker)}
       //   // this.markerLatLng = p.latlng
       //   // map.addLayer(L.marker(p.latlng))
@@ -94,6 +101,10 @@ export default {
       // })
       // .on("click", this.selectGeo)
       // .addLayer(L.marker(this.markerLatLng))
+      console.log(map)
+    },
+    mapDel(){
+      const map = L.map("detail_map", {}).remove()
       console.log(map)
     },
     selectGeo(p){
@@ -112,6 +123,28 @@ export default {
           console.log(this.datasArr[0].name)
         });
     },
+    async fetchData(){
+      const docRef = doc(db, "datas", this.detailObjP.id);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+        this.name = docSnap.data().name
+      // this.pay = this.detailObj.pay.concat()
+      this.pay = docSnap.data().pay.concat()
+      this.genre = docSnap.data().genre.concat()
+      // Object.assign(this.map, this.detailObj.map)
+      this.rootMemo = docSnap.data().rootMemo.concat()
+      this.menu = docSnap.data().menu.concat()
+      this.markerLatLng.lat = JSON.parse(JSON.stringify(docSnap.data().map)).latitude
+      this.markerLatLng.lng = JSON.parse(JSON.stringify(docSnap.data().map)).longitude
+      console.log(this.markerLatLng)
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    },
+
     closeWindow(){
       this.$emit('close')
     },
@@ -137,9 +170,9 @@ export default {
 
         <div class="detail_head">
           <div class="batsu" @click="closeWindow()">X</div>
-          <h3>{{ this.detailObj.name }}</h3>
-          <div><span v-for="d in detailObj.pay" :key="d">{{ payMethods[d] }},</span></div>
-          <div><span v-for="d in detailObj.pay" :key="d">{{ genreArr[d] }},</span></div>
+          <h3>{{ this.name }}</h3>
+          <div><span v-for="p in pay" :key="p">{{ payMethods[p] }},</span></div>
+          <div><span v-for="g in genre" :key="g">{{ genreArr[g] }},</span></div>
         
         </div>
         <div id="detail_map"  v-show="!isEdit"><!-------------------------->
@@ -156,38 +189,38 @@ export default {
             <p>ポイント</p>
           </div>
           <div  class="detail_memo_li_wrap">
-            <li class="detail_memo_li" v-for="d in detailObj.rootMemo" :key="d.name">
-              {{d.value}}
+            <li class="detail_memo_li" v-for="r in rootMemo" :key="r.name">
+              {{r.value}}
             </li>
           </div>
         </div>
         <div class="detail_menu">
 
-          <div class="detail_menu_li" v-for="(d,index) in detailObj.menu" :key="index">
+          <div class="detail_menu_li" v-for="(m,index) in menu" :key="index">
             <div class="detail_menu_img_wrap">
-                <div  v-if="!d.img"  class="detail_menu_svg">
+                <div  v-if="!m.img"  class="detail_menu_svg">
                       <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
                         <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
                         <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54A.505.505 0 0 1 1 12.5v-9a.5.5 0 0 1 .5-.5h13z"/>
                       </svg>
                 </div>
                 <div  v-else  class="detail_menu_img">
-                  <img :src="d.img" alt="">
+                  <img :src="m.img" alt="">
                 </div>
             </div>
             <div class="detail_menu_name">
-              <div>{{d.menuName}}</div>
-              <p>{{d.memo}}</p>
+              <div>{{m.menuName}}</div>
+              <p>{{m.memo}}</p>
             </div>
             <div class="detail_menu_price">
-              {{d.price}} 円
+              {{m.price}} 円
             </div>
           </div>
 
         </div>
         <div class="detail_react">
-          <div><button>うまい</button></div>
-          <div><button>イマイチ</button></div>
+          <div><button @click="fetchData()">うまい</button></div>
+          <div><button @click="mapDel()">イマイチ</button></div>
         </div>
         <div class="detail_edit">
           <div @click="openEdit()">情報修正</div>

@@ -46,7 +46,24 @@ export default {
         });
         this.datasArrJson =  JSON.parse(JSON.stringify(this.datasArr)).concat()
         console.log(this.datasArrJson)
-
+    },
+    async reloadDetail(detailId){  //全てのdatasデータ取得
+        this.closeComp()
+        this.datasArr = []
+        this.datasArrJson = []
+        const querySnapshot = await getDocs(collection(db, "datas"));
+        querySnapshot.forEach((docu) => {
+          // doc.data() is never undefined for query doc snapshots
+          console.log(docu.id, " => ", docu.data());
+          const dataObj = Object.assign(docu.data(),{id:docu.id})
+          console.log(dataObj)
+          this.datasArr.push(dataObj)
+          console.log(this.datasArr)
+        });
+        this.datasArrJson =  JSON.parse(JSON.stringify(this.datasArr)).concat()
+        console.log(this.datasArrJson)
+        console.log(detailId)
+        this.openDetail(detailId)
     },
     closeComp(){
       this.isDetail = false
@@ -58,6 +75,7 @@ export default {
       this.isDetail = true
     },
     searchDetailObj(id){
+      this.detailObjP = {}
       this.datasArrJson.forEach(e=>{
         if(e.id==id){
           Object.assign(this.detailObjP, e)
@@ -78,12 +96,12 @@ export default {
     </div> -->
     <!-- ------------------------>
     <div class="edit_comp" v-if="isEdit">
-      <EditComp  @close="closeComp()"/>
+      <EditComp  @close="closeComp()" @reload="reloadDetail"/>
     </div>
     <!-- ------------------------>
     <div class="detail_comp" v-if="isDetail">
       <DetailComp :datasArrJson="datasArrJson" :detailObjP="detailObjP" 
-      @close="closeComp()" @reload="fetchDatasAll()"/>
+      @close="closeComp()" @reload="reloadDetail"/>
     </div>
     <!-- ------------------------>
     

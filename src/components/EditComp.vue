@@ -1,6 +1,6 @@
 <script>
   import firebaseApp from "../plugins/firebaseConfig"
-  import { getFirestore, getDocs, collection, setDoc, doc, } from "firebase/firestore"
+  import { getFirestore, getDocs, collection, setDoc, doc, addDoc, Timestamp } from "firebase/firestore"
   import { getStorage, ref, uploadBytesResumable, getDownloadURL, } from "firebase/storage"
 
 
@@ -82,10 +82,11 @@ export default {
     },
     formatData(){ //新規作成なので、念のためデータをリセットします
       this.name = ""
-      this.payNow = []
+      this.payNow = [0,]
       this.genreNow = []
       this.rootMemo = [{value:'',score:0},{value:'',score:0},{value:'',score:0},{value:'',score:0},{value:'',score:0}]
       this.menu = [{menuName:'',price:null,memo:'',img:''},{menuName:'',price:null,memo:'',img:''},{menuName:'',price:null,memo:'',img:''}]
+      this.markerLatLng2 = {lat:null,lng:null}
     },
     mapUpdate(){
       const map2 = L.map("detail_map2", {
@@ -176,8 +177,32 @@ export default {
       { merge: true }
       );
       console.log('update data!')
-      this.$emit('reload')
+      this.$emit('reload', this.detailObj.id)
       console.log('update parent data!')
+      this.closeWindow()
+    },
+    //firestoreに新規登録するメソッド
+    async createFiredatas(){
+      //画像URLをimg_urlで処理していたので、menuに反映させておきます
+      for(let i=0;i<3;i++){
+        this.menu[i].img = this.img_url[i]
+      }
+      //datas内の既存のuidに対して、上書き保存します
+      const docRef = await addDoc(collection(db, "datas"),{ 
+        name: this.name,
+        pay: this.payNow,
+        genre: this.genreNow,
+        rootMemo: JSON.parse(JSON.stringify(this.rootMemo)),
+        menu: JSON.parse(JSON.stringify(this.menu)),
+        map: {latitude: this.markerLatLng2.lat, longitude: this.markerLatLng2.lng},
+        date: Timestamp.fromDate(new Date()),
+        
+        },
+      );
+      console.log('create data!')
+      console.log(docRef.id)
+      this.$emit('reload', docRef.id)
+      // console.log('update parent data!')
       this.closeWindow()
     },
 
@@ -260,7 +285,7 @@ export default {
           <div><button class="detail_refresh_btn" @click="run()">更新する</button></div>
         </div>
         <div class="detail_refresh" v-show="isRegist">
-          <div><button class="detail_refresh_btn">登録する</button></div>
+          <div><button class="detail_refresh_btn" @click="createFiredatas">新規登録する</button></div>
         </div>
 
         <!-- <div class="detail_react">
