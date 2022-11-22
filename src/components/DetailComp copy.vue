@@ -3,24 +3,13 @@
   import firebaseApp from "../plugins/firebaseConfig"
   import { getFirestore, getDocs, collection } from "firebase/firestore"
 
-import 'leaflet/dist/leaflet.css'
-import { LMap, LTileLayer,LMarker } from "vue2-leaflet";
-import { Icon } from 'leaflet';
-
-delete Icon.Default.prototype._getIconUrl;
-Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-});
-
   const db = getFirestore(firebaseApp)
 
 export default {
   name: 'DetailComp',
   props: ['detailObj',],
   components: {
-    EditComp, LMap, LTileLayer, LMarker,
+    EditComp
   },
   data(){
     return{
@@ -29,12 +18,6 @@ export default {
       isEdit:false,
       payMethods:['現金','Paypay','d払い','クレカ',],
       genreArr:['ラーメン','肉','定食系','カレー','その他',],
-
-    url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
-    zoom: 8,
-    center: [34, 137],
-    testdata:'',
-
     }
   },
   mounted(){
@@ -42,6 +25,11 @@ export default {
     console.log('detail mounted')
         // console.log(this.datasArrJson)
         // console.log(this.detailObj.menu[0].img)
+        // setTimeout(()=>{
+        // this.isShow = true
+        // console.log(this.datasArrJson)
+        // console.log(this.detailObj.menu[0].img)
+        // },1000)
   },
   methods:{
     async fetchUsersAll(){  //全てのdatasデータ取得
@@ -86,18 +74,7 @@ export default {
         
         </div>
         <div class="detail_map">
-
-
-
-          <div>{{ testdata }}</div>
-          <l-map style="height: 250px" :zoom="zoom" :center="center">
-            <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-            <l-marker :lat-lng="markerLatLng"></l-marker>
-          </l-map>
-
-
-
-
+          <img src="#" alt="">
         </div>
         <div class="detail_memo">
           <div class="detail_memo_ttl">
