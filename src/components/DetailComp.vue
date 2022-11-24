@@ -68,6 +68,7 @@ export default {
 
       this.dataSet()
       this.mapSet()
+      this.outsideClick()
   
   },
   methods:{
@@ -146,27 +147,40 @@ export default {
     },
 
     closeWindow(){
-      this.$emit('close')
+      if(this.isEdit==false){
+      this.$emit('close')}
     },
     closeEdit(){
       this.isEdit = false
     },
     openEdit(){
       this.isEdit = true
-    }
+    },
+    outsideClick(){
+      if(this.isEdit==false){
+        let modal = document.getElementById('detail_home_cont');
+        modal.addEventListener('click', (event) => {
+          if(event.target.closest('#detail_main, #edit_home_cont, #detail_map2') === null) {
+            // alert('外側をクリックされました。');
+            console.log('outside click')
+            this.closeWindow()
+          }
+        })
+      }
+    },
   }
 }
 </script>
 
 <template>
-  <div class="detail_home_cont">
+  <div class="detail_home_cont" id="detail_home_cont">
     <!-- 全画面表示のもの -------------------------------------------------------->
     <div class="edit_comp" v-if="isEdit">
       <EditComp :detailObj="detailObj" @close="closeEdit()" @reload="$listeners['reload']"/>
     </div>
     <!-- ------------------------>
     <div class="detail_cont">
-      <div class="detail_main">
+      <div class="detail_main" id="detail_main">
 
         <div class="detail_head">
           <div class="batsu" @click="closeWindow()">X</div>
@@ -219,8 +233,8 @@ export default {
 
         </div>
         <div class="detail_react">
-          <div><button @click="fetchData()">うまい</button></div>
-          <div><button @click="mapDel()">イマイチ</button></div>
+          <div><button >うまい</button></div>
+          <div><button >イマイチ</button></div>
         </div>
         <div class="detail_edit">
           <div @click="openEdit()">情報修正</div>
@@ -243,7 +257,7 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1;
+  z-index: 3;
 }
 /* -------------------------------------------- */
 .detail_cont{

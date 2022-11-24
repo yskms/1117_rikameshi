@@ -41,12 +41,12 @@ export default {
       genreArr:['hideAll','ラーメン','肉','定食系','カレー','カフェ','お弁当','その他',],
       isRegist:false,//編集か新規登録かのフラグ
 
-      thumbnail:['','',''],//画像情報たくさんのオブジェクト
+      thumbnail:['','',''],//画像情報たくさんのオブジェクト配列
       img_url:['','',''], //画像描画用にローカルのURL or FirestorageのURLを入れる
+      isWait:false,
 
       markerLatLng2: {},
       // option2: { name: "2" },
-      blob:'',
     }
   },
   mounted(){
@@ -135,6 +135,7 @@ export default {
       // img_url:['','',''], //画像描画用にローカルのURL or FirestorageのURLを入れる
       //compression_url:['','',''],//圧縮後のファイルのblob?を入れる
     imgUpload(event, index) {
+      this.isWait = true
       console.log(event)
       console.log(index)
       this.thumbnail[index] = event.target.files[0]
@@ -146,11 +147,11 @@ export default {
     },
 
     handleFiles(index) {
-      const self = this
+      const self = this //このしたがnewしてるからthisを転記しておきます
       new Compressor(this.thumbnail[index], {
         quality: 0.6,
         // maxWidth: 100,
-        maxHeight: 100,
+        // maxHeight: 100,
         mimeType: 'image/jpeg',
         success(blob) {
           // ここに成功時の処理を書く。次。
@@ -165,29 +166,6 @@ export default {
         }
       })
     },
-
-    handleFiles2(index) {
-      const self = this
-      const payload = Compressor.Options = {
-        quality: 0.6,
-        maxWidth: 100,
-        maxHeight: 100,
-        mimeType: 'image/jpeg',
-        success(blob) {
-          // ここに成功時の処理を書く。次。
-          console.log(blob)
-          const obj = {blob:blob,index:index}
-          // this.blob = blob
-          // console.log(this.blob)
-          self.uploadFirestorage(obj)
-        },
-        error(err){
-          console.log(err.message)
-        }
-      }
-      new Compressor(this.thumbnail[index], payload)
-    },
-
     uploadFirestorage(obj){
       console.log('a' + Math.random().toString(32).substring(2)) // 'a6dpgjqlq8g' 等
       // const storageRef = ref(firestorage, `files/${this.thumbnail[index].name}`)
@@ -199,58 +177,8 @@ export default {
           getDownloadURL(snapshot.ref)
             .then((url) => {
               console.log('Success! : ' + url)
-              // this.img_url[index] = url
-            })
-        }).catch((error) => {
-          console.error(error)
-        })
-    },
-    
-
-      // thumbnail:['','',''],//画像情報たくさんのオブジェクト
-      // img_url:['','',''], //画像描画用にローカルのURL or FirestorageのURLを入れる
-    imgUpload2(event, index) {
-      console.log(event)
-      console.log(index)
-      this.thumbnail[index] = event.target.files[0]
-      console.log(this.thumbnail[index])
-      this.img_url[index] = URL.createObjectURL(this.thumbnail[index])
-      this.img_url.splice()//配列を変更しないけど変更して、Vueに反応させてます
-      //ここまででブラウザ表示は一旦できてる
-      this.uploadFirestorage(index)
-    },
-
-    //   const storageRef = ref(firestorage, `files/${this.thumbnail[index].name}`)
-    //   uploadBytesResumable(storageRef, this.thumbnail[index])
-    //     .then((snapshot) => {
-    //       getDownloadURL(snapshot.ref)
-    //         .then((url) => {
-    //           console.log('Success! : ' + url)
-    //           this.img_url[index] = url
-    //         })
-    //     }).catch((error) => {
-    //       console.error(error)
-    //     })
-    // },
-  
-      // thumbnail:['','',''],//画像情報たくさんのオブジェクト
-      // img_url:['','',''], //画像描画用にローカルのURL or FirestorageのURLを入れる
-    imgUpload3(event, index) {
-      console.log(event)
-      console.log(index)
-      this.thumbnail[index] = event.target.files[0]
-      console.log(this.thumbnail[index])
-      this.img_url[index] = URL.createObjectURL(this.thumbnail[index])
-      this.img_url.splice()//配列を変更しないけど変更して、Vueに反応させてます
-      //ここまででブラウザ表示は一旦できてる
-
-      const storageRef = ref(firestorage, `files/${this.thumbnail[index].name}`)
-      uploadBytesResumable(storageRef, this.thumbnail[index])
-        .then((snapshot) => {
-          getDownloadURL(snapshot.ref)
-            .then((url) => {
-              console.log('Success! : ' + url)
-              this.img_url[index] = url
+              this.img_url[obj.index] = url
+              this.isWait = false
             })
         }).catch((error) => {
           console.error(error)
@@ -318,7 +246,7 @@ export default {
 </script>
 
 <template>
-  <div class="detail_home_cont">
+  <div class="edit_home_cont" id="edit_home_cont">
     <!-- 全画面表示のもの -------------------------------------------------------->
     <!-- <div class="start">
       <div class="logo">
@@ -390,12 +318,20 @@ export default {
           </div>
         </div>
 
-        <div class="detail_refresh" v-show="!isRegist">
-          <div><button class="detail_refresh_btn" @click="run()">更新する</button></div>
+        <div class="detail_refresh">
+          <div>
+            <button v-if="isWait" class="detail_refresh_btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-hourglass-split" viewBox="0 0 16 16">
+                <path d="M2.5 15a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1h-11zm2-13v1c0 .537.12 1.045.337 1.5h6.326c.216-.455.337-.963.337-1.5V2h-7zm3 6.35c0 .701-.478 1.236-1.011 1.492A3.5 3.5 0 0 0 4.5 13s.866-1.299 3-1.48V8.35zm1 0v3.17c2.134.181 3 1.48 3 1.48a3.5 3.5 0 0 0-1.989-3.158C8.978 9.586 8.5 9.052 8.5 8.351z"/>
+              </svg>
+            </button>
+            <button v-else-if="!isRegist" class="detail_refresh_btn" @click="run()">更新する</button>
+            <button v-else class="detail_refresh_btn" @click="createFiredatas">新規登録する</button>
+          </div>
         </div>
-        <div class="detail_refresh" v-show="isRegist">
-          <div><button class="detail_refresh_btn" @click="createFiredatas">新規登録する</button></div>
-        </div>
+        <!-- <div class="detail_refresh" v-show="isRegist">
+          <div></div>
+        </div> -->
 
         <!-- <div class="detail_react">
           <div><button>うまい</button></div>
@@ -413,7 +349,7 @@ export default {
 </template>
 
 <style scoped>
-.detail_home_cont{
+.edit_home_cont{
   height: 100vh;
   width: 100vw;
   background-color: rgba(255, 255, 0,0.5);
@@ -578,6 +514,7 @@ export default {
   border-radius: 10px;
   border: 1px solid grey;
   border-radius: 5px;
+  width: 130px;
 }
 /* --------------------------- */
 /* .detail_edit{
