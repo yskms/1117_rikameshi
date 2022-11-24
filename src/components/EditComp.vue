@@ -2,7 +2,7 @@
   import firebaseApp from "../plugins/firebaseConfig"
   import { getFirestore, getDocs, collection, setDoc, doc, addDoc, Timestamp } from "firebase/firestore"
   import { getStorage, ref, uploadBytesResumable, getDownloadURL, } from "firebase/storage"
-
+  import Compressor from 'compressorjs'
 
   import 'leaflet/dist/leaflet.css'
   import L from "leaflet";
@@ -46,11 +46,13 @@ export default {
 
       markerLatLng2: {},
       // option2: { name: "2" },
+      blob:'',
     }
   },
   mounted(){
         console.log('edit mounted')
         console.log(this.detailObj)
+        console.log('a' + Math.random().toString(32).substring(2)) // 'a6dpgjqlq8g' 等
         // console.log(this.detailObj.id)
         if(this.detailObj){ //detailObjを受け取っていれば編集モード
           this.copyData()
@@ -129,6 +131,9 @@ export default {
       this.$emit('close')
     },
 
+      // thumbnail:['','',''],//画像情報たくさんのオブジェクト
+      // img_url:['','',''], //画像描画用にローカルのURL or FirestorageのURLを入れる
+      //compression_url:['','',''],//圧縮後のファイルのblob?を入れる
     imgUpload(event, index) {
       console.log(event)
       console.log(index)
@@ -136,6 +141,108 @@ export default {
       console.log(this.thumbnail[index])
       this.img_url[index] = URL.createObjectURL(this.thumbnail[index])
       this.img_url.splice()//配列を変更しないけど変更して、Vueに反応させてます
+      //ここまででブラウザ表示は一旦できてる
+      this.handleFiles(index)
+    },
+
+    handleFiles(index) {
+      const self = this
+      new Compressor(this.thumbnail[index], {
+        quality: 0.6,
+        // maxWidth: 100,
+        maxHeight: 100,
+        mimeType: 'image/jpeg',
+        success(blob) {
+          // ここに成功時の処理を書く。次。
+          console.log(blob)
+          const obj = {blob:blob,index:index}
+          // this.blob = blob
+          // console.log(this.blob)
+          self.uploadFirestorage(obj)
+        },
+        error(err){
+          console.log(err.message)
+        }
+      })
+    },
+
+    handleFiles2(index) {
+      const self = this
+      const payload = Compressor.Options = {
+        quality: 0.6,
+        maxWidth: 100,
+        maxHeight: 100,
+        mimeType: 'image/jpeg',
+        success(blob) {
+          // ここに成功時の処理を書く。次。
+          console.log(blob)
+          const obj = {blob:blob,index:index}
+          // this.blob = blob
+          // console.log(this.blob)
+          self.uploadFirestorage(obj)
+        },
+        error(err){
+          console.log(err.message)
+        }
+      }
+      new Compressor(this.thumbnail[index], payload)
+    },
+
+    uploadFirestorage(obj){
+      console.log('a' + Math.random().toString(32).substring(2)) // 'a6dpgjqlq8g' 等
+      // const storageRef = ref(firestorage, `files/${this.thumbnail[index].name}`)
+      // const storageRef = ref(firestorage, `files/${obj.blob.name}`)
+      const storageRef = ref(firestorage, `files/a${Math.random().toString(32).substring(2)}`)
+      // uploadBytesResumable(storageRef, this.thumbnail[obj.index])
+      uploadBytesResumable(storageRef, obj.blob)
+        .then((snapshot) => {
+          getDownloadURL(snapshot.ref)
+            .then((url) => {
+              console.log('Success! : ' + url)
+              // this.img_url[index] = url
+            })
+        }).catch((error) => {
+          console.error(error)
+        })
+    },
+    
+
+      // thumbnail:['','',''],//画像情報たくさんのオブジェクト
+      // img_url:['','',''], //画像描画用にローカルのURL or FirestorageのURLを入れる
+    imgUpload2(event, index) {
+      console.log(event)
+      console.log(index)
+      this.thumbnail[index] = event.target.files[0]
+      console.log(this.thumbnail[index])
+      this.img_url[index] = URL.createObjectURL(this.thumbnail[index])
+      this.img_url.splice()//配列を変更しないけど変更して、Vueに反応させてます
+      //ここまででブラウザ表示は一旦できてる
+      this.uploadFirestorage(index)
+    },
+
+    //   const storageRef = ref(firestorage, `files/${this.thumbnail[index].name}`)
+    //   uploadBytesResumable(storageRef, this.thumbnail[index])
+    //     .then((snapshot) => {
+    //       getDownloadURL(snapshot.ref)
+    //         .then((url) => {
+    //           console.log('Success! : ' + url)
+    //           this.img_url[index] = url
+    //         })
+    //     }).catch((error) => {
+    //       console.error(error)
+    //     })
+    // },
+  
+      // thumbnail:['','',''],//画像情報たくさんのオブジェクト
+      // img_url:['','',''], //画像描画用にローカルのURL or FirestorageのURLを入れる
+    imgUpload3(event, index) {
+      console.log(event)
+      console.log(index)
+      this.thumbnail[index] = event.target.files[0]
+      console.log(this.thumbnail[index])
+      this.img_url[index] = URL.createObjectURL(this.thumbnail[index])
+      this.img_url.splice()//配列を変更しないけど変更して、Vueに反応させてます
+      //ここまででブラウザ表示は一旦できてる
 
       const storageRef = ref(firestorage, `files/${this.thumbnail[index].name}`)
       uploadBytesResumable(storageRef, this.thumbnail[index])
@@ -196,7 +303,7 @@ export default {
         menu: JSON.parse(JSON.stringify(this.menu)),
         map: {latitude: this.markerLatLng2.lat, longitude: this.markerLatLng2.lng},
         date: Timestamp.fromDate(new Date()),
-        fav: 0,
+        good: 0,
         },
       );
       console.log('create data!')
