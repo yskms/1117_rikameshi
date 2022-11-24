@@ -49,8 +49,9 @@ export default {
       rootMemo : this.detailObjP.rootMemo,
       menu : this.detailObjP.menu,
       img_url:[],
-
-      isMapDel:false,
+  
+      // isMapDel:false,
+      isReview:false,
 
     }
   },
@@ -87,10 +88,10 @@ export default {
       // .addLayer(L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"))
       let addMarker = L.marker(this.markerLatLng).addTo(map)
       console.log(addMarker)
-      if(this.isMapDel){
-        this.isMapDel = false
-        map.remove()
-      }
+      // if(this.isMapDel){
+      //   this.isMapDel = false
+      //   map.remove()
+      // }
       // map.on("viewreset", p => {
       //   if(addMarker){map.removeLayer(addMarker)}
       //   // this.markerLatLng = p.latlng
@@ -147,8 +148,8 @@ export default {
     },
 
     closeWindow(){
-      if(this.isEdit==false){
-      this.$emit('close')}
+      // if(this.isEdit==false){
+      this.$emit('close')
     },
     closeEdit(){
       this.isEdit = false
@@ -157,16 +158,29 @@ export default {
       this.isEdit = true
     },
     outsideClick(){
-      if(this.isEdit==false){
+      // if(this.isEdit==false){//なぜかこれは刺さりませんcloseWindowでやると刺さる。
         let modal = document.getElementById('detail_home_cont');
         modal.addEventListener('click', (event) => {
-          if(event.target.closest('#detail_main, #edit_home_cont, #detail_map2') === null) {
-            // alert('外側をクリックされました。');
-            console.log('outside click')
-            this.closeWindow()
+          if(this.isEdit==false){//ここに移動したら刺さった
+            if(event.target.closest('#detail_main, #edit_home_cont, #detail_map2, #review_cont') === null) {
+              // alert('外側をクリックされました。');
+              console.log('outside click')
+              this.closeWindow()
+            }
           }
         })
-      }
+      // }
+    },
+    outsideClickReview(){
+        this.isReview = true
+        console.log(this.isReview)
+        let modal = document.getElementById('review_cont');
+        modal.addEventListener('click', (event) => {
+            if(event.target.closest('#review_main') === null) {
+              console.log('outside click')
+              this.isReview=false
+            }
+        })
     },
   }
 }
@@ -178,6 +192,14 @@ export default {
     <div class="edit_comp" v-if="isEdit">
       <EditComp :detailObj="detailObj" @close="closeEdit()" @reload="$listeners['reload']"/>
     </div>
+    <!-- ------------------------>
+    <div class="review_cont" v-show="isReview" id="review_cont">
+      <div class="review_main" id="review_main">
+        <p>うまかった？</p>
+        <div><button>YES!</button></div>
+      </div>
+    </div>
+    <!-- 全画面表示のもの ここまで-------------------------------------------------------->
     <!-- ------------------------>
     <div class="detail_cont">
       <div class="detail_main" id="detail_main">
@@ -233,8 +255,8 @@ export default {
 
         </div>
         <div class="detail_react">
-          <div><button >うまい</button></div>
-          <div><button >イマイチ</button></div>
+          <div><button @click="isReview=!isReview">うまい</button></div>
+          <div><button @click="outsideClickReview">イマイチ</button></div>
         </div>
         <div class="detail_edit">
           <div @click="openEdit()">情報修正</div>
@@ -258,6 +280,46 @@ export default {
   top: 0;
   left: 0;
   z-index: 3;
+}
+/* -------------------------------------------- */
+.review_cont{
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.5);
+  /* display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; */
+  position: absolute;
+  /* top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); */
+  z-index: 2;
+  /* padding: 1.5em; */
+  /* font-size: 2em; */
+}
+.review_main{
+  gap: 0.5em;
+  height: 20%;
+  width: 80%;
+  background-color: rgba(255, 255, 0, 1);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* z-index: 100; */
+  padding: 1.5em;
+  font-size: 2em;
+}
+.review_main button{
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 0 10px;
 }
 /* -------------------------------------------- */
 .detail_cont{
@@ -292,6 +354,7 @@ export default {
   width: 100%;
   height: 30vh;
   background-color: rgb(0, 0, 136);
+  z-index: 1;
 }
 /* --------------------------- */
 .detail_memo{
