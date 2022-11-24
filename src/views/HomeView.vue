@@ -4,7 +4,7 @@
   import EditComp from '@/components/EditComp.vue'
 
   import firebaseApp from "../plugins/firebaseConfig"
-  import { getFirestore, getDocs, collection } from "firebase/firestore"
+  import { getFirestore, getDocs, collection, orderBy, query, } from "firebase/firestore"
   // import { getStorage, } from "firebase/storage"
 
 
@@ -23,8 +23,12 @@ export default {
       isDetail:false,
       isEdit:false,
       payMethods:['現金','Paypay','d払い','クレカ',],
-      genreArr:['ラーメン','肉','定食系','カレー','その他',],
+      genreArrSort:['ALL','ラーメン','肉','定食系','カレー','カフェ','お弁当','その他',],
+      genreArr:['','ラーメン','肉','定食系','カレー','カフェ','お弁当','その他',],
       detailObjP:{},
+      sortArr:[],
+      isSelected:[true,false,false,false,false,false,false,false,],
+      isSelectedTheme:[false,false,false],//ランキング、ランダム、お気に入りを想定
     }
   },
   mounted(){
@@ -35,7 +39,13 @@ export default {
     async fetchDatasAll(){  //全てのdatasデータ取得
         this.datasArr = []
         this.datasArrJson = []
-        const querySnapshot = await getDocs(collection(db, "datas"));
+        this.sortArr = []
+        // const querySnapshot = await getDocs(collection(db, "datas"));
+        const datasRef = collection(db, "datas")
+        const que = query(datasRef, orderBy("date","desc"))
+        const querySnapshot = await getDocs(que)
+        //1行だと走らなかったよ
+        // const querySnapshot = await getDocs(query(collection(db, "datas")), orderBy("genre","desc"))
         querySnapshot.forEach((docu) => {
           // doc.data() is never undefined for query doc snapshots
           console.log(docu.id, " => ", docu.data());
@@ -45,13 +55,20 @@ export default {
           console.log(this.datasArr)
         });
         this.datasArrJson =  JSON.parse(JSON.stringify(this.datasArr)).concat()
+        this.sortArr =  JSON.parse(JSON.stringify(this.datasArr)).concat()
         console.log(this.datasArrJson)
     },
-    async reloadDetail(detailId){  //全てのdatasデータ取得
+    async reloadDetail(detailId){  //更新、登録時のリロード用。全てのdatasデータ取得
         this.closeComp()
         this.datasArr = []
         this.datasArrJson = []
-        const querySnapshot = await getDocs(collection(db, "datas"));
+        this.sortArr = []
+        // const querySnapshot = await getDocs(collection(db, "datas"));
+        const datasRef = collection(db, "datas")
+        const que = query(datasRef, orderBy("date","desc"))
+        const querySnapshot = await getDocs(que)
+        //1行だと走らなかったよ
+        // const querySnapshot = await getDocs(query(collection(db, "datas")), orderBy("genre","desc"))
         querySnapshot.forEach((docu) => {
           // doc.data() is never undefined for query doc snapshots
           console.log(docu.id, " => ", docu.data());
@@ -61,6 +78,7 @@ export default {
           console.log(this.datasArr)
         });
         this.datasArrJson =  JSON.parse(JSON.stringify(this.datasArr)).concat()
+        this.sortArr =  JSON.parse(JSON.stringify(this.datasArr)).concat()
         console.log(this.datasArrJson)
         console.log(detailId)
         this.openDetail(detailId)
@@ -81,6 +99,55 @@ export default {
           Object.assign(this.detailObjP, e)
         }
       })
+    },
+    // sort---------------------
+    sortGenre(number){
+      this.isSelectedTheme = [false,false,false]
+      this.isSelected = [false,false,false,false,false,false,false,false,]
+      this.isSelected[number] = true
+      this.sortArr = [],
+      this.datasArrJson.forEach(e=>{
+        for(let i=0;i<e.genre.length;i++){
+          if(e.genre[i]==number){
+            this.sortArr.push(e)
+            break
+          }
+        }
+      })
+      console.log(this.sortArr)
+    },
+    sortRank(){
+      this.isSelectedTheme = [true,false,false]
+      this.isSelected = [false,false,false,false,false,false,false,false,]
+      this.sortArr = this.datasArrJson.concat()
+      this.sortArr.sort(function(a,b){
+        if(a.good < b.good){
+          return 1
+        }else{
+          return -1
+        }
+      })
+      console.log(this.sortArr)
+    },
+    sortRandom(){
+      this.isSelectedTheme = [false,true,false]
+      this.isSelected = [false,false,false,false,false,false,false,false,]
+      const datasArrJsonCopy = this.datasArrJson.concat()
+      console.log(datasArrJsonCopy)
+      this.sortArr = []
+      // const testArr=[]
+      for(let j=0,len=datasArrJsonCopy.length; j<5; j++,len--){
+        const rand = Math.floor(Math.random()*len) //乱数
+        console.log(`length: ${datasArrJsonCopy.length}`)
+        console.log(rand)
+        console.log(datasArrJsonCopy)
+        this.sortArr.push(datasArrJsonCopy.splice(rand,1)[0])
+        // testArr.push(datasArrJsonCopy.splice(rand,1)[0])
+        console.log(this.sortArr)
+        // console.log(testArr)
+      }
+      console.log(this.sortArr)
+        // console.log(testArr)
     },
   }
 }
@@ -112,17 +179,19 @@ export default {
         <div @click="isEdit=!isEdit">+++</div>
       </div>
       <div class="home_tag">
-        <div class="home_tag_theme">
-          <button>ランキング</button>
-          <button>ランダム5</button>
-        </div>
         <div class="home_tag_genre">
-          <button>ラーメン</button>
+          <span v-for="(g,index) in genreArrSort" :key="index">
+            <button @click="sortGenre(index)" :class="{selected:isSelected[index]}">{{g}}</button>
+          </span>
+        </div>
+        <div class="home_tag_theme">
+          <button @click="sortRank" :class="{selected:isSelectedTheme[0]}">ランキング</button>
+          <button @click="sortRandom" :class="{selected:isSelectedTheme[1]}">ランダム5</button>
         </div>
       </div>
 
       <div class="home_list_main">
-        <div v-for="(data,index) in datasArrJson" :key="index"
+        <div v-for="(data,index) in sortArr" :key="index"
         class="home_list_wrap" @click="openDetail(data.id)">
 
           <div class="home_list_img_wrap">
@@ -184,7 +253,7 @@ export default {
 }
 /* ----------------------------------- */
 .home_tag{
-  height: 10%;
+  height: 12%;
   text-align: left;
   background-color: yellow;
 }
@@ -192,6 +261,11 @@ export default {
   border: 1px solid grey;
   border-radius: 5px;
   margin-top: 5px;
+  margin-right: 5px;
+}
+.selected{
+  border-radius: 5px;
+  background-color: grey;
 }
 /* ----------------------------------- */
 .home_list_wrap{

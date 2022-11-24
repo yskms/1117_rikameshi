@@ -29,7 +29,7 @@ export default {
       // isShow:false,
       isEdit:false,
       payMethods:['現金','Paypay','d払い','クレカ',],
-      genreArr:['ラーメン','肉','定食系','カレー','その他',],
+      genreArr:['','ラーメン','肉','定食系','カレー','カフェ','お弁当','その他',],
 
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       // url: "http://{s}.tile.osm.org/{z}/{x}/{y}.png",
@@ -213,7 +213,7 @@ export default {
               <p>{{m.memo}}</p>
             </div>
             <div class="detail_menu_price">
-              {{m.price}} 円
+              <div>{{m.price}} 円</div>
             </div>
           </div>
 
@@ -338,6 +338,10 @@ export default {
 }
 .detail_menu_name{
   width: 60%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 .detail_menu_name p{
   font-size: 0.8em;
@@ -345,6 +349,9 @@ export default {
 }
 .detail_menu_price{
   width: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 /* --------------------------- */
 .detail_react{

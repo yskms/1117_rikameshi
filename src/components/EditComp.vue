@@ -27,9 +27,9 @@ export default {
       // datasArrJson2:[],
       // isShow:false,
       name:'',
-      pay:[0,1,2,3,],
+      // pay:[0,1,2,3,],
       payNow:[],
-      genre:[0,1,2,3,4,],
+      // genre:[0,1,2,3,4,],
       genreNow:[],
       map:{},
       // rootMemo:[{value:''},{value:''},{value:''},{value:''},{value:''}],
@@ -38,7 +38,7 @@ export default {
       menu:[],
       // fav:0,
       payMethods:['現金','Paypay','d払い','クレカ',],
-      genreArr:['ラーメン','肉','定食系','カレー','その他',],
+      genreArr:['hideAll','ラーメン','肉','定食系','カレー','カフェ','お弁当','その他',],
       isRegist:false,//編集か新規登録かのフラグ
 
       thumbnail:['','',''],//画像情報たくさんのオブジェクト
@@ -83,7 +83,7 @@ export default {
     formatData(){ //新規作成なので、念のためデータをリセットします
       this.name = ""
       this.payNow = [0,]
-      this.genreNow = []
+      this.genreNow = [0,]
       this.rootMemo = [{value:'',score:0},{value:'',score:0},{value:'',score:0},{value:'',score:0},{value:'',score:0}]
       this.menu = [{menuName:'',price:null,memo:'',img:''},{menuName:'',price:null,memo:'',img:''},{menuName:'',price:null,memo:'',img:''}]
       this.markerLatLng2 = {lat:null,lng:null}
@@ -196,7 +196,7 @@ export default {
         menu: JSON.parse(JSON.stringify(this.menu)),
         map: {latitude: this.markerLatLng2.lat, longitude: this.markerLatLng2.lng},
         date: Timestamp.fromDate(new Date()),
-        
+        fav: 0,
         },
       );
       console.log('create data!')
@@ -226,13 +226,15 @@ export default {
           <div class="batsu" @click="closeWindow()">X</div>
           <h3><input v-model="name" placeholder=" 店名"></h3>
           <div class="detail_head_pay">
-              <div v-for="(p,index) in pay" :key="index">
-                <input type="checkbox" :id="p" v-model="payNow" :value="p">{{payMethods[p]}}
+              <div v-for="(p,index) in payMethods" :key="index">
+                <input type="checkbox" :id="p" v-model="payNow" :value="index">
+                <label :for="p">{{p}}</label>
               </div>
           </div>
           <div class="detail_head_genre">
-              <div v-for="(p,index) in genre" :key="index">
-                <input type="checkbox" :id="p" v-model="genreNow" :value="p">{{genreArr[p]}}
+              <div v-for="(g,index) in genreArr" :key="index" :class="g">
+                <input type="checkbox" :id="g" v-model="genreNow" :value="index">
+                <label :for="g">{{g}}</label>
               </div>
           </div>
 
@@ -259,8 +261,8 @@ export default {
               <input type="file" :id="'img'+ index" accept="img/*" @change="imgUpload($event, index)"
               style="display:none">
               <label :for="'img'+ index">
-                <div  v-if="!img_url[index]" >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
+                <div class="noImgfile" v-if="!img_url[index]" >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-card-image" viewBox="0 0 16 16">
                     <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
                     <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54A.505.505 0 0 1 1 12.5v-9a.5.5 0 0 1 .5-.5h13z"/>
                   </svg>
@@ -335,7 +337,7 @@ export default {
 .detail_head{
   position: relative;
   width: 100%;
-  height: 5em;
+  height: 6.5em;
 }
 .batsu{
   position: absolute;
@@ -351,9 +353,23 @@ export default {
 .detail_head_pay{
   display: flex;
   align-items: center;
+  gap: 0.3em;
 }
 .detail_head_genre{
   display: flex;
+  flex-wrap: wrap;
+  /* gap: 0.3em; */
+}
+.detail_head_genre div{
+  margin-right: 0.3em;
+}
+#hideAll{
+  display: none;
+  margin: 0;
+}
+.hideAll{
+  display: none;
+  margin: 0;
 }
 /* --------------------------- */
 #detail_map2{
@@ -407,6 +423,12 @@ export default {
   width: 20%;
   /* background-color: rgb(0, 50, 23); */
 }
+.noImgfile{
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .imgfile{
   height: 100%;
 }
@@ -422,12 +444,14 @@ export default {
   width: 90%;
   border: 1px solid grey;
   border-radius: 5px;
+  padding-left: 0.3em;
 }
 .detail_menu_memo p input{
   font-size: 0.8em;
   width: 90%;
   border: 1px solid grey;
   border-radius: 5px;
+  padding-left: 0.3em;
 }
 .detail_menu_price{
   width: 20%;
