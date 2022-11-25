@@ -1,7 +1,7 @@
 <script>
   import EditComp from '@/components/EditComp.vue'
   import firebaseApp from "../plugins/firebaseConfig"
-  import { getFirestore, getDocs, collection, getDoc, doc, } from "firebase/firestore"
+  import { getFirestore, getDocs, collection, getDoc, doc, setDoc, } from "firebase/firestore"
 
 import 'leaflet/dist/leaflet.css'
 import L from "leaflet";
@@ -52,6 +52,8 @@ export default {
   
       // isMapDel:false,
       isReview:false,
+      isGood:true,
+      isThanks:false,
 
     }
   },
@@ -171,9 +173,10 @@ export default {
         })
       // }
     },
-    outsideClickReview(){
+    outsideClickReview(tf){
+        this.isGood = tf
         this.isReview = true
-        console.log(this.isReview)
+        console.log(this.isGood)
         let modal = document.getElementById('review_cont');
         modal.addEventListener('click', (event) => {
             if(event.target.closest('#review_main') === null) {
@@ -181,6 +184,27 @@ export default {
               this.isReview=false
             }
         })
+    },
+
+    //firestoreをアップデートするメソッド
+    async updateFiredatas(number){
+      //datas内の既存のuidに対して、上書き保存します
+      this.isThanks = true
+      console.log(this.isThanks)
+      console.log(this.detailObjP.good )
+      console.log(this.detailObjP.good + number)
+      //detailObjPを使っているので更新をかけない限り追加評価できない！
+      //実現したかった挙動になっているのでこのまま使います
+      await setDoc(doc(db, "datas", this.detailObj.id), 
+      { good: this.detailObjP.good + number,
+        },
+      { merge: true }
+      );
+      console.log('update data!')
+      setTimeout(() => {
+        this.isThanks = false
+        this.isReview = false
+      }, 1500);
     },
   }
 }
@@ -194,9 +218,19 @@ export default {
     </div>
     <!-- ------------------------>
     <div class="review_cont" v-show="isReview" id="review_cont">
-      <div class="review_main" id="review_main">
-        <p>うまかった？</p>
-        <div><button>YES!</button></div>
+      <div class="review_main" id="review_main" v-if="isGood">
+        <div class="review_thanks" v-show="isThanks">
+          <p>Thank you for your vote!</p>
+        </div>
+        <p>Do you Like？</p>
+        <div><button @click="updateFiredatas(1)">YES !!</button></div>
+      </div>
+      <div class="review_main" id="review_main" v-else-if="!isGood">
+        <div class="review_thanks" v-show="isThanks">
+          <p>Thank you for your vote!</p>
+        </div>
+        <p>Not Good？</p>
+        <div><button @click="updateFiredatas(-2)">not good</button></div>
       </div>
     </div>
     <!-- 全画面表示のもの ここまで-------------------------------------------------------->
@@ -255,8 +289,8 @@ export default {
 
         </div>
         <div class="detail_react">
-          <div><button @click="isReview=!isReview">うまい</button></div>
-          <div><button @click="outsideClickReview">イマイチ</button></div>
+          <div><button @click="outsideClickReview(true)">うまい</button></div>
+          <div><button @click="outsideClickReview(false)">イマイチ</button></div>
         </div>
         <div class="detail_edit">
           <div @click="openEdit()">情報修正</div>
@@ -300,7 +334,7 @@ export default {
 }
 .review_main{
   gap: 0.5em;
-  height: 20%;
+  height: 25%;
   width: 80%;
   background-color: rgba(255, 255, 0, 1);
   border-radius: 10px;
@@ -312,9 +346,24 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  /* z-index: 100; */
   padding: 1.5em;
   font-size: 2em;
+}
+.review_thanks{
+  height: 30%;
+  width: 80%;
+  background-color: rgba(255, 255, 0, 1);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1.5em;
+  font-size: 1.2em;
 }
 .review_main button{
   border: 1px solid;
@@ -438,6 +487,8 @@ export default {
 .detail_react button{
   border: 1px solid grey;
   border-radius: 5px;
+  margin: 0 20px;
+  padding: 0 10px;
 }
 /* --------------------------- */
 .detail_edit{
