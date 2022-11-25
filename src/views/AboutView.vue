@@ -159,9 +159,6 @@ export default {
         <div v-for="(data,index) in datasArrJson" :key="index"
         class="home_list_wrap" @click="openDetail(data.id)">
           <div class="home_list_img_wrap">
-            <img src="@/assets/ramen.jpeg" alt="">
-            <img src="@/assets/ramen.jpeg" alt="">
-            <img src="@/assets/ramen.jpeg" alt="">
           </div>
           <div class="home_list_ttl_wrap">
             <div class="home_list_ttl">

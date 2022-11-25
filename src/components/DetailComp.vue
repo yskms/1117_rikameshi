@@ -239,7 +239,12 @@ export default {
       <div class="detail_main" id="detail_main">
 
         <div class="detail_head">
-          <div class="batsu" @click="closeWindow()">X</div>
+          <div class="batsu" @click="closeWindow()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z"/>
+              <path fill-rule="evenodd" d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z"/>
+            </svg>
+          </div>
           <h3>{{ this.name }}</h3>
           <div><span v-for="p in pay" :key="p">{{ payMethods[p] }},</span></div>
           <div><span v-for="g in genre" :key="g">{{ genreArr[g] }},</span></div>
@@ -410,7 +415,7 @@ export default {
   display: flex;
   width: 100%;
   /* padding: 5px; */
-  background-color: gainsboro;
+  background-color: rgb(235, 235, 235);
   border-radius: 10px;
   margin-top: 5px;
 }
