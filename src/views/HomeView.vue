@@ -210,7 +210,7 @@ export default {
 
           <div class="home_list_ttl_wrap">
             <div class="home_list_ttl">
-              <span>{{data.name}}</span>
+              <div>{{data.name}}</div>
             </div>
             <div class="home_list_pay_wrap">
               <div class="home_list_pay" v-for="d in data.pay" :key="d">
@@ -260,7 +260,7 @@ export default {
   position: fixed;
   bottom: 10px;
   right: 10px;
-  z-index: 3;
+  z-index: 1;
 }
 /* ----------------------------------- */
 .home_tag{
@@ -268,6 +268,7 @@ export default {
   text-align: left;
   background-color: rgb(245, 245, 228);
   margin-top: 1em;
+  margin-bottom: 1em;
 }
 .home_tag_genre{
   height: 50%;
@@ -345,21 +346,27 @@ export default {
 .home_list_ttl_wrap{
   width: 50%;
   height: 100%;
-  padding: 20px 0 20px 8px;
+  padding: 0.5% 0 0.5% 1%;
   position: relative;
 }
 .home_list_ttl{
-  height: 40%;
+  height: 60%;
   font-size: 1.2em;
   text-align: left;
   position: relative;
   /* border-bottom: 1px solid #b6e3e3; */
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+    justify-content: left;
+    align-items: center;
 }
-.home_list_ttl span{
+.home_list_ttl div{
   background: linear-gradient(transparent 50%, #ffff64 60%);
   padding: 0 10px 0 0;
+  height: 1.5em;
+  overflow: hidden;
+  display: inline-block;
 }
 /* .home_list_ttl::before{
   content: "";
@@ -369,14 +376,14 @@ export default {
   height: 100%;
 } */
 .home_list_pay_wrap{
-  height: 30%;
+  height: 20%;
   display: flex;
   justify-content: end;
   gap: 5px;
   font-size: 0.7em;
 }
 .home_list_genre_wrap{
-  height: 30%;
+  height: 20%;
   display: flex;
   justify-content: end;
   gap: 5px;

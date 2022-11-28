@@ -248,29 +248,9 @@ export default {
           <h3>{{ this.name }}</h3>
           <div><span v-for="p in pay" :key="p">{{ payMethods[p] }},</span></div>
           <div><span v-for="g in genre" :key="g">{{ genreArr[g] }},</span></div>
-        
         </div>
-        <div id="detail_map"  v-show="!isEdit"><!-------------------------->
-          <!-- <div>{{ testdata }}</div> -->
-          <!-- <l-map style="height: 100%" :zoom="zoom" :center="center">
-            <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-            <l-marker :lat-lng="markerLatLng"></l-marker>
-          </l-map> -->
-          <!-- -------------------------------------->
 
-        </div>
-        <div class="detail_memo">
-          <div class="detail_memo_ttl">
-            <p>ポイント</p>
-          </div>
-          <div  class="detail_memo_li_wrap">
-            <li class="detail_memo_li" v-for="r in rootMemo" :key="r.name">
-              {{r.value}}
-            </li>
-          </div>
-        </div>
         <div class="detail_menu">
-
           <div class="detail_menu_li" v-for="(m,index) in menu" :key="index">
             <div class="detail_menu_img_wrap">
                 <div  v-if="!m.img"  class="detail_menu_svg">
@@ -291,8 +271,29 @@ export default {
               <div>{{m.price}} 円</div>
             </div>
           </div>
-
         </div>
+
+        <div class="detail_memo">
+          <div class="detail_memo_ttl">
+            <p>ポイント</p>
+          </div>
+          <div  class="detail_memo_li_wrap">
+            <li class="detail_memo_li" v-for="r in rootMemo" :key="r.name">
+              {{r.value}}
+            </li>
+          </div>
+        </div>
+
+        <div id="detail_map"  v-show="!isEdit"><!-------------------------->
+          <!-- <div>{{ testdata }}</div> -->
+          <!-- <l-map style="height: 100%" :zoom="zoom" :center="center">
+            <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
+            <l-marker :lat-lng="markerLatLng"></l-marker>
+          </l-map> -->
+          <!-- -------------------------------------->
+        </div>
+
+
         <div class="detail_react">
           <div><button @click="outsideClickReview(true)">うまい</button></div>
           <div><button @click="outsideClickReview(false)">イマイチ</button></div>
@@ -311,7 +312,7 @@ export default {
 .detail_home_cont{
   height: 100vh;
   width: 100vw;
-  background-color: rgba(255, 255, 0,0.5);
+  background-color: rgba(0, 0, 0,0.1);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -379,15 +380,20 @@ export default {
 .detail_cont{
   height: 90%;
   width: 90%;
-  background-color: rgba(255, 255, 255, 0.5);
+  /* background-color: rgba(255, 255, 255, 0.5); */
+  background-color: rgb(245, 245, 228);
   /* z-index: 5; */
+  scroll-snap-type: y mandatory;
+  overflow: auto;
+  border-radius: 20px;
+  box-shadow: 0px 0px 16px -6px rgba(0,0,0,0.6);
 }
 .detail_main{
   display: flex;
   flex-direction: column;
   /* justify-content: center; */
   align-items: center;
-  background-color: whitesmoke;
+  background-color: rgb(245, 245, 228);
   width: 90%;
   margin: auto;
 }
@@ -395,13 +401,24 @@ export default {
 .detail_head{
   position: relative;
   width: 100%;
-  height: 5em;
+  height: 10%;
+  padding-top: 1em;
+  padding-bottom: 0.5em;
 }
 .batsu{
   position: absolute;
   top: 0;
   right: 0;
   cursor: pointer;
+}
+.detail_head h3{
+  font-size: 1.5em;
+  background: linear-gradient(transparent 50%, #ffff64 60%);
+  padding: 0 10px 0 0;
+  display: inline-block;
+}
+.detail_head span{
+  font-size: 0.8em;
 }
 /* --------------------------- */
 #detail_map{
