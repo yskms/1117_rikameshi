@@ -332,7 +332,7 @@ export default {
 /* --------------------------- */
 .home_list_img_wrap{
   height: 100%;
-  width: 50%;
+  width: 39%;
   display: flex;
   /* gap: 3px; */
   scroll-snap-type: x mandatory;
@@ -345,7 +345,8 @@ export default {
   top: 0;
   width: 1.1em;
   /* background-color: black; */
-  background-image: linear-gradient(90deg,rgba(255,255,255,0.1) 50%,rgba(255,255,255,1) 100%);
+  /* background-image: linear-gradient(90deg,rgba(255,255,255,0.1) 50%,rgba(255,255,255,1) 100%); */
+  background-image: linear-gradient(90deg, transparent 0%, transparent 70%, #fff 100%);
   height: 100%;
 }
 .home_list_img{
