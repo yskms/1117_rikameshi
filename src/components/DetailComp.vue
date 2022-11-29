@@ -465,7 +465,7 @@ export default {
 }
 .batsu{
   position: absolute;
-  top: 5px;
+  top: 12px;
   right: 0;
   cursor: pointer;
 }
@@ -609,6 +609,7 @@ export default {
   border-bottom: 1px solid #5bacff;
   cursor: pointer;
   font-size: 0.7em;
+  margin-bottom: 3em;
 }
 /* --------------------------- */
 /* --------------------------- */

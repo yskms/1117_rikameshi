@@ -395,7 +395,7 @@ export default {
   top: 3.3em;
   right: 1em;
   cursor: pointer;
-  z-index: 5;
+  z-index: 401;
 }
 .detail_head input{
   border: 1px solid grey;

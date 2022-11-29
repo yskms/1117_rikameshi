@@ -179,6 +179,7 @@ export default {
     
     <!-- 全画面表示のもの ここまで-------------------------------------------------------->
     <div class="home_main">
+      <div class="header">
       <div class="home_head">
         <span>
           <svg width="199" height="30" viewBox="0 0 199 34" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -196,6 +197,7 @@ export default {
           <button @click="sortRank" :class="{selected:isSelectedTheme[0]}">ランキング</button>
           <button @click="sortRandom" :class="{selected:isSelectedTheme[1]}">ランダム5</button>
         </div>
+      </div>
       </div>
 
       <div class="home_list_main">
@@ -248,13 +250,24 @@ export default {
   background-color: rgb(245, 245, 228);
   scroll-snap-type: y mandatory;
   overflow: auto;
+  position: relative;
 }
 /* ----------------------------------- */
+.header{
+  height: 14%;
+  position: fixed;
+  width: 90%;
+  background-color: rgba(245, 245, 228, 0.7);
+  z-index: 1;
+  padding-top: 3px;
+}
+/* ------------------ */
 .home_head{
-  height: 4%;
+  /* height: 4%; */
   background-color: #ffea00;
-  position: relative;
+  /* position: relative; */
   border-radius: 50px  0 50px 0;
+  width: 100%;
 }
 .home_head svg{
   height: 100%;
@@ -265,9 +278,9 @@ export default {
   right: 10px;
   z-index: 1;
 }
-/* ----------------------------------- */
+/* ------------------ */
 .home_tag{
-  height: 10%;
+  /* height: 10%; */
   text-align: left;
   background-color: rgb(245, 245, 228);
   margin-top: 1em;
@@ -303,6 +316,9 @@ export default {
   color: white;
 }
 /* ----------------------------------- */
+.home_list_main{
+  padding-top: 40%;
+}
 .home_list_wrap{
   display: flex;
   padding: 10px;
