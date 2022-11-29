@@ -55,6 +55,9 @@ export default {
       isGood:true,
       isThanks:false,
 
+      isBig:false,
+      bigPhotoUrl:'',
+
     }
   },
   computed:{
@@ -164,7 +167,7 @@ export default {
         let modal = document.getElementById('detail_home_cont');
         modal.addEventListener('click', (event) => {
           if(this.isEdit==false){//ここに移動したら刺さった
-            if(event.target.closest('#detail_main, #edit_home_cont, #detail_map2, #review_cont') === null) {
+            if(event.target.closest('#detail_main, #edit_home_cont, #detail_map2, #review_cont, #big_photo_cont') === null) {
               // alert('外側をクリックされました。');
               console.log('outside click')
               this.closeWindow()
@@ -184,6 +187,23 @@ export default {
               this.isReview=false
             }
         })
+    },
+    outsideClickBigPhoto(url){
+        this.bigPhotoUrl = url
+        this.isBig = true
+        let modal = document.getElementById('big_photo_cont');
+        modal.addEventListener('click', (event) => {
+              //書き換えるのが面倒なのでreview_mainにしてます。どこをクリックしてもbigPhoto閉じる挙動です
+            if(event.target.closest('#review_main') === null) {
+              console.log('outside click')
+              this.isBig=false
+            }
+        })
+    },
+    bigPhoto(url){
+      this.bigPhotoUrl = url
+      this.isBig = true
+      console.log(this.bigPhotoUrl)
     },
 
     //firestoreをアップデートするメソッド
@@ -230,7 +250,13 @@ export default {
           <p>Thank you for your vote!</p>
         </div>
         <p>Not Good？</p>
-        <div><button @click="updateFiredatas(-2)">not good</button></div>
+        <div><button @click="updateFiredatas(-2)">not good..</button></div>
+      </div>
+    </div>
+    <!-- ------------------------>
+    <div class="big_photo_cont" id="big_photo_cont" v-show="isBig">
+      <div class="big_photo_main" id="big_photo_main">
+        <img :src="bigPhotoUrl" alt="big_photo">
       </div>
     </div>
     <!-- 全画面表示のもの ここまで-------------------------------------------------------->
@@ -260,7 +286,7 @@ export default {
                       </svg>
                 </div>
                 <div  v-else  class="detail_menu_img">
-                  <img :src="m.img" alt="">
+                  <img :src="m.img" alt="photo" @click="outsideClickBigPhoto(m.img)">
                 </div>
             </div>
             <div class="detail_menu_name">
@@ -275,10 +301,10 @@ export default {
 
         <div class="detail_memo">
           <div class="detail_memo_ttl">
-            <p>ポイント</p>
+            <p>- おすすめポイント -</p>
           </div>
           <div  class="detail_memo_li_wrap">
-            <li class="detail_memo_li" v-for="r in rootMemo" :key="r.name">
+            <li :class="{detail_memo_li:index%2==1}" v-for="(r,index) in rootMemo" :key="index">
               {{r.value}}
             </li>
           </div>
@@ -298,8 +324,8 @@ export default {
           <div><button @click="outsideClickReview(true)">うまい</button></div>
           <div><button @click="outsideClickReview(false)">イマイチ</button></div>
         </div>
-        <div class="detail_edit">
-          <div @click="openEdit()">情報修正</div>
+        <div class="detail_edit" @click="openEdit()">
+          <div>情報修正</div>
         </div>
       </div>
     </div>
@@ -321,6 +347,7 @@ export default {
   left: 0;
   z-index: 3;
 }
+/* 全画面表示のもの------------------------------------------ */
 /* -------------------------------------------- */
 .review_cont{
   height: 100vh;
@@ -375,13 +402,44 @@ export default {
   border: 1px solid;
   border-radius: 5px;
   padding: 0 10px;
+  border-radius: 3px;
+  box-shadow: -5px -5px 10px 0px rgba(255, 255, 255, 0.5), 5px 5px 10px 0px rgba(0, 0, 0, 0.3);
 }
+/* -------------------------------------------- */
+.big_photo_cont{
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.8);
+  position: absolute;
+  z-index: 2;
+}
+.big_photo_main{
+  height: 45%;
+  width: 90%;
+  /* background-color: rgba(255, 255, 0, 1); */
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  }
+.big_photo_main img{
+  height: 100%;
+  width: 100%;
+  object-fit: scale-down;
+}
+
+/* 全画面表示のもの ここまで------------------------------------------ */
 /* -------------------------------------------- */
 .detail_cont{
   height: 90%;
   width: 90%;
   /* background-color: rgba(255, 255, 255, 0.5); */
-  background-color: rgb(245, 245, 228);
+  background-color: white; 
   /* z-index: 5; */
   scroll-snap-type: y mandatory;
   overflow: auto;
@@ -393,7 +451,7 @@ export default {
   flex-direction: column;
   /* justify-content: center; */
   align-items: center;
-  background-color: rgb(245, 245, 228);
+  background-color: white;
   width: 90%;
   margin: auto;
 }
@@ -407,7 +465,7 @@ export default {
 }
 .batsu{
   position: absolute;
-  top: 0;
+  top: 5px;
   right: 0;
   cursor: pointer;
 }
@@ -418,38 +476,12 @@ export default {
   display: inline-block;
 }
 .detail_head span{
-  font-size: 0.8em;
-}
-/* --------------------------- */
-#detail_map{
-  width: 100%;
-  height: 30vh;
-  background-color: rgb(0, 0, 136);
-  z-index: 1;
-}
-/* --------------------------- */
-.detail_memo{
-  display: flex;
-  width: 100%;
-  /* padding: 5px; */
-  background-color: rgb(235, 235, 235);
-  border-radius: 10px;
-  margin-top: 5px;
-}
-.detail_memo_ttl{
-  width: 30%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.detail_memo_li_wrap{
-  width: 70%;
-  text-align: left;
+  font-size: 0.7em;
 }
 /* --------------------------- */
 .detail_menu{
   width: 100%;
+  margin-bottom: 0.5em;
 }
 .detail_menu_li{
   display: flex;
@@ -482,7 +514,10 @@ export default {
 .detail_menu_img img{
   height: 100%;
   width: 100%;
-  object-fit: scale-down;
+  /* object-fit: scale-down; */
+  object-fit: cover;
+    object-position: center;
+    border-radius: 10px;
 }
 .detail_menu_name{
   width: 60%;
@@ -491,8 +526,14 @@ export default {
   justify-content: center;
   align-items: center;
 }
+.detail_menu_name div{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9em;
+  font-weight: bold;
+}
 .detail_menu_name p{
-  font-size: 0.8em;
+  font-size: 0.7em;
   text-align: center;
 }
 .detail_menu_price{
@@ -502,21 +543,72 @@ export default {
   align-items: center;
 }
 /* --------------------------- */
+.detail_memo{
+  /* display: flex; */
+  width: 100%;
+  /* padding: 5px; */
+  background-color: white;
+  /* border-radius: 10px; */
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+.detail_memo_ttl{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.6em;
+  background-color: rgb(245, 245, 228);
+}
+.detail_memo_li_wrap{
+  width: 100%;
+  text-align: center;
+  list-style: none;
+  font-size: 0.9em;
+}
+.detail_memo_li_wrap li{
+  /* padding: 2px 0; */
+  margin: 2px 0;
+}
+.detail_memo_li{
+  /* background-color: white; */
+  background-color: rgb(245, 245, 228);
+}
+
+/* --------------------------- */
+#detail_map{
+  width: 100%;
+  height: 30vh;
+  background-color: rgb(0, 0, 136);
+  z-index: 1;
+  margin-bottom: 1em;
+}
+
+/* --------------------------- */
 .detail_react{
   display: flex;
   margin: 10px;
 }
 .detail_react button{
   border: 1px solid grey;
-  border-radius: 5px;
+  border-radius: 30px;
   margin: 0 20px;
   padding: 0 10px;
+  font-size: 0.9em;
+  /* font-weight: bold; */
+  /* box-shadow: 0px 0px 16px -6px rgba(0,0,0,0.6) inset; */
+  box-shadow: 0px 0px 11px -6px rgb(0 0 0 / 60%);
+  /* background-color: white; */
 }
 /* --------------------------- */
 .detail_edit{
   margin: 5px;
-  background-color: aliceblue;
-  
+  /* background-color: aliceblue; */
+  /* background-color: #5bacff; */
+  border-bottom: 1px solid #5bacff;
+  cursor: pointer;
+  font-size: 0.7em;
 }
 /* --------------------------- */
 /* --------------------------- */

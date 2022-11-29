@@ -256,6 +256,9 @@ export default {
   position: relative;
   border-radius: 50px  0 50px 0;
 }
+.home_head svg{
+  height: 100%;
+}
 .add_store{
   position: fixed;
   bottom: 10px;
@@ -269,6 +272,7 @@ export default {
   background-color: rgb(245, 245, 228);
   margin-top: 1em;
   margin-bottom: 1em;
+  color: black;
 }
 .home_tag_genre{
   height: 50%;
@@ -296,6 +300,7 @@ export default {
   border-radius: 5px;
   background-color: #5bacff;
   /* background-color: #f5cfc8; */
+  color: white;
 }
 /* ----------------------------------- */
 .home_list_wrap{
@@ -338,19 +343,21 @@ export default {
 .home_list_img img{
   height: 100%;
   /* width: 100%; */
-  object-fit: scale-down;
+  /* object-fit: scale-down; */
   object-position: center center;
   border-radius: 8px;
+  object-fit: cover;
+    object-position: center;
 }
 /* --------------------------- */
 .home_list_ttl_wrap{
   width: 50%;
   height: 100%;
-  padding: 0.5% 0 0.5% 1%;
+  padding: 0.5% 0 0.5% 3%;
   position: relative;
 }
 .home_list_ttl{
-  height: 60%;
+  height: 50%;
   font-size: 1.2em;
   text-align: left;
   position: relative;
@@ -359,7 +366,7 @@ export default {
   text-overflow: ellipsis;
   display: flex;
     justify-content: left;
-    align-items: center;
+    align-items: end;
 }
 .home_list_ttl div{
   background: linear-gradient(transparent 50%, #ffff64 60%);

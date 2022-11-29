@@ -364,13 +364,15 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1;
+  z-index: 2;
 }
 /* -------------------------------------------- */
 .detail_cont{
   height: 90%;
   width: 90%;
   background-color: whitesmoke;
+  scroll-snap-type: y mandatory;
+  overflow: auto;
 }
 .detail_main{
   display: flex;
@@ -390,7 +392,7 @@ export default {
 }
 .batsu{
   position: absolute;
-  top: 3px;
+  top: 5px;
   right: 0;
   cursor: pointer;
 }
@@ -398,6 +400,7 @@ export default {
   border: 1px solid grey;
   border-radius: 5px;
   /* text-align: center; */
+  background-color: white;
 }
 .detail_head_pay{
   display: flex;
@@ -428,28 +431,33 @@ export default {
 }
 /* --------------------------- */
 .detail_memo{
-  display: flex;
+  /* display: flex; */
   width: 100%;
   /* padding: 5px; */
-  background-color: gainsboro;
+  /* background-color: gainsboro; */
   border-radius: 10px;
   margin-top: 5px;
 }
 .detail_memo_ttl{
-  width: 30%;
+  width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 0.7em;
 }
 .detail_memo_li_wrap{
-  width: 70%;
+  width: 100%;
   text-align: left;
+  list-style: none;
+  text-align: center;
 }
 .detail_memo_li input{
   border: 1px solid grey;
   border-radius: 5px;
   margin: 1px;
+  width: 70%;
+  background-color: white;
 }
 /* --------------------------- */
 .detail_menu{
@@ -494,6 +502,7 @@ export default {
   border: 1px solid grey;
   border-radius: 5px;
   padding-left: 0.3em;
+  background-color: white;
 }
 .detail_menu_memo p input{
   font-size: 0.8em;
@@ -501,6 +510,7 @@ export default {
   border: 1px solid grey;
   border-radius: 5px;
   padding-left: 0.3em;
+  background-color: white;
 }
 .detail_menu_price{
   width: 20%;
@@ -509,6 +519,7 @@ export default {
   width: 80%;
   border: 1px solid grey;
   border-radius: 5px;
+  background-color: white;
 }
 /* --------------------------- */
 .detail_refresh{
@@ -516,11 +527,13 @@ export default {
   margin: 10px;
 }
 .detail_refresh_btn{
-  padding: 1em;
+  padding: 0.7em;
   border-radius: 10px;
   border: 1px solid grey;
   border-radius: 5px;
   width: 130px;
+  background-color: white;
+  box-shadow: 0px 0px 10px -6px rgba(0,0,0,0.6);
 }
 /* --------------------------- */
 /* .detail_edit{
