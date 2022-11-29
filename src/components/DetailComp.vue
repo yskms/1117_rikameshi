@@ -167,7 +167,7 @@ export default {
         let modal = document.getElementById('detail_home_cont');
         modal.addEventListener('click', (event) => {
           if(this.isEdit==false){//ここに移動したら刺さった
-            if(event.target.closest('#detail_main, #edit_home_cont, #detail_map2, #review_cont, #big_photo_cont') === null) {
+            if(event.target.closest('#detail_cont, #edit_home_cont, #detail_map2, #review_cont, #big_photo_cont') === null) {
               // alert('外側をクリックされました。');
               console.log('outside click')
               this.closeWindow()
@@ -261,7 +261,7 @@ export default {
     </div>
     <!-- 全画面表示のもの ここまで-------------------------------------------------------->
     <!-- ------------------------>
-    <div class="detail_cont">
+    <div class="detail_cont" id="detail_cont">
       <div class="detail_main" id="detail_main">
 
         <div class="detail_head">

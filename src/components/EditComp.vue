@@ -387,20 +387,22 @@ export default {
 .detail_head{
   position: relative;
   width: 100%;
-  height: 6.5em;
+  height: 8.5em;
   padding-top: 0.5em;
 }
 .batsu{
-  position: absolute;
-  top: 5px;
-  right: 0;
+  position: fixed;
+  top: 3.3em;
+  right: 1em;
   cursor: pointer;
+  z-index: 5;
 }
 .detail_head input{
   border: 1px solid grey;
   border-radius: 5px;
   /* text-align: center; */
   background-color: white;
+  margin-bottom: 0.5em;
 }
 .detail_head_pay{
   display: flex;
@@ -437,6 +439,7 @@ export default {
   /* background-color: gainsboro; */
   border-radius: 10px;
   margin-top: 5px;
+  margin-bottom: 5px;
 }
 .detail_memo_ttl{
   width: 100%;

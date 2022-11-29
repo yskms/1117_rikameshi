@@ -386,6 +386,7 @@ export default {
   height: 20%;
   display: flex;
   justify-content: end;
+  align-items: center;
   gap: 5px;
   font-size: 0.7em;
 }
