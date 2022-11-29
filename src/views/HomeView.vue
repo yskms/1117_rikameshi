@@ -317,7 +317,7 @@ export default {
 }
 /* ----------------------------------- */
 .home_list_main{
-  padding-top: 40%;
+  padding-top: 9em;
 }
 .home_list_wrap{
   display: flex;
