@@ -368,7 +368,7 @@ export default {
 }
 /* --------------------------- */
 .home_list_ttl_wrap{
-  width: 50%;
+  width: 61%;
   height: 100%;
   padding: 0.5% 0 0.5% 3%;
   position: relative;

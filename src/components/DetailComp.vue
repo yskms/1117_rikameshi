@@ -383,7 +383,7 @@ export default {
   font-size: 2em;
 }
 .review_thanks{
-  height: 30%;
+  height: 100%;
   width: 80%;
   background-color: rgba(255, 255, 0, 1);
   border-radius: 10px;
