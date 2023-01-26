@@ -180,6 +180,7 @@ export default {
     
     <!-- 全画面表示のもの ここまで-------------------------------------------------------->
     <div class="home_main">
+      <div class="header">
       <div class="home_head">
         <span>
           <svg width="199" height="30" viewBox="0 0 199 34" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -197,6 +198,7 @@ export default {
           <button @click="sortRank" :class="{selected:isSelectedTheme[0]}">ランキング</button>
           <button @click="sortRandom" :class="{selected:isSelectedTheme[1]}">ランダム5</button>
         </div>
+      </div>
       </div>
 
       <div class="home_list_main">
@@ -257,13 +259,27 @@ export default {
   background-color: rgb(245, 245, 228);
   scroll-snap-type: y mandatory;
   overflow: auto;
+  position: relative;
 }
 /* ----------------------------------- */
+.header{
+  height: 14%;
+  position: fixed;
+  width: 90%;
+  background-color: rgba(245, 245, 228, 0.7);
+  z-index: 1;
+  padding-top: 3px;
+}
+/* ------------------ */
 .home_head{
-  height: 4%;
+  /* height: 4%; */
   background-color: #ffea00;
-  position: relative;
+  /* position: relative; */
   border-radius: 50px  0 50px 0;
+  width: 100%;
+}
+.home_head svg{
+  height: 100%;
 }
 .add_store{
   position: fixed;
@@ -271,13 +287,14 @@ export default {
   right: 10%;
   z-index: 1;
 }
-/* ----------------------------------- */
+/* ------------------ */
 .home_tag{
-  height: 10%;
+  /* height: 10%; */
   text-align: left;
   background-color: rgb(245, 245, 228);
   margin-top: 1em;
   margin-bottom: 1em;
+  color: black;
 }
 .home_tag_genre{
   height: 50%;
@@ -305,8 +322,12 @@ export default {
   border-radius: 5px;
   background-color: #5bacff;
   /* background-color: #f5cfc8; */
+  color: white;
 }
 /* ----------------------------------- */
+.home_list_main{
+  padding-top: 9em;
+}
 .home_list_wrap{
   display: flex;
   padding: 10px;
@@ -320,7 +341,7 @@ export default {
 /* --------------------------- */
 .home_list_img_wrap{
   height: 100%;
-  width: 50%;
+  width: 39%;
   display: flex;
   /* gap: 3px; */
   scroll-snap-type: x mandatory;
@@ -333,7 +354,8 @@ export default {
   top: 0;
   width: 1.1em;
   /* background-color: black; */
-  background-image: linear-gradient(90deg,rgba(255,255,255,0.1) 50%,rgba(255,255,255,1) 100%);
+  /* background-image: linear-gradient(90deg,rgba(255,255,255,0.1) 50%,rgba(255,255,255,1) 100%); */
+  background-image: linear-gradient(90deg, transparent 0%, transparent 70%, #fff 100%);
   height: 100%;
 }
 .home_list_img{
@@ -347,19 +369,21 @@ export default {
 .home_list_img img{
   height: 100%;
   /* width: 100%; */
-  object-fit: scale-down;
+  /* object-fit: scale-down; */
   object-position: center center;
   border-radius: 8px;
+  object-fit: cover;
+    object-position: center;
 }
 /* --------------------------- */
 .home_list_ttl_wrap{
-  width: 50%;
+  width: 61%;
   height: 100%;
-  padding: 0.5% 0 0.5% 1%;
+  padding: 0.5% 0 0.5% 3%;
   position: relative;
 }
 .home_list_ttl{
-  height: 60%;
+  height: 50%;
   font-size: 1.2em;
   text-align: left;
   position: relative;
@@ -368,7 +392,7 @@ export default {
   text-overflow: ellipsis;
   display: flex;
     justify-content: left;
-    align-items: center;
+    align-items: end;
 }
 .home_list_ttl div{
   background: linear-gradient(transparent 50%, #ffff64 60%);
@@ -388,6 +412,7 @@ export default {
   height: 20%;
   display: flex;
   justify-content: end;
+  align-items: center;
   gap: 5px;
   font-size: 0.7em;
 }
