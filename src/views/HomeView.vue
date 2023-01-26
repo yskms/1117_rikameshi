@@ -269,6 +269,8 @@ export default {
   background-color: rgba(245, 245, 228, 0.7);
   z-index: 1;
   padding-top: 3px;
+  max-width: 375px;
+  margin: 0 auto;
 }
 /* ------------------ */
 .home_head{
