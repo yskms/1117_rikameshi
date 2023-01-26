@@ -154,6 +154,7 @@ export default {
 </script>
 
 <template>
+<div class="bg">
   <div class="home_cont">
     <!-- 全画面表示のもの -------------------------------------------------------->
     <!-- <div class="start">
@@ -229,10 +230,18 @@ export default {
     </div>
     <!-- ------------------------>
   </div>
+</div>
 </template>
 
 <style scoped>
+.bg{
+  height: 100vh;
+  width: 100vw;
+  background-color: rgb(245, 245, 228);
+}
 .home_cont{
+  max-width: 375px;
+  margin: 0 auto;
   height: 100vh;
   width: 100vw;
   background-color: rgb(245, 245, 228);
@@ -259,7 +268,7 @@ export default {
 .add_store{
   position: fixed;
   bottom: 10px;
-  right: 10px;
+  right: 10%;
   z-index: 1;
 }
 /* ----------------------------------- */

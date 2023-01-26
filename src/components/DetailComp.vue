@@ -310,6 +310,8 @@ export default {
 
 <style scoped>
 .detail_home_cont{
+  max-width: 375px;
+  margin: 0 auto;
   height: 100vh;
   width: 100vw;
   background-color: rgba(0, 0, 0,0.1);
