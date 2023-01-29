@@ -269,7 +269,7 @@ export default {
   background-color: rgba(245, 245, 228, 0.7);
   z-index: 1;
   padding-top: 3px;
-  max-width: 375px;
+  max-width: 340px;
   margin: 0 auto;
 }
 /* ------------------ */
@@ -284,9 +284,9 @@ export default {
   height: 100%;
 }
 .add_store{
-  position: fixed;
+  position: absolute;
   bottom: 10px;
-  right: 10%;
+  right: 0;
   z-index: 1;
 }
 /* ------------------ */

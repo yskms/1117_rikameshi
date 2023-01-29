@@ -393,9 +393,9 @@ export default {
   padding-top: 0.5em;
 }
 .batsu{
-  position: fixed;
-  top: 3.3em;
-  right: 1em;
+  position: absolute;
+  top: 0.5em;
+  right: 0em;
   cursor: pointer;
   z-index: 401;
 }
